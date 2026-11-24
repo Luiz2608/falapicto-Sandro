@@ -1,0 +1,476 @@
+{
+  "_nota": "Vocabulário PROVISÓRIO. Trocar/ajustar depois da entrevista. Emojis são placeholders; depois usar pictogramas (ex.: ARASAAC, checar licença).",
+  "categories": {
+    "pessoa": {
+      "nome": "Pessoas",
+      "cor": "#FFD93D"
+    },
+    "verbo": {
+      "nome": "Ações",
+      "cor": "#6BCB77"
+    },
+    "objeto": {
+      "nome": "Coisas",
+      "cor": "#FF9F45"
+    },
+    "sentir": {
+      "nome": "Sentimentos",
+      "cor": "#4D96FF"
+    },
+    "social": {
+      "nome": "Social",
+      "cor": "#FF8FB1"
+    },
+    "resposta": {
+      "nome": "Respostas",
+      "cor": "#B28DFF"
+    }
+  },
+  "cards": [
+    {
+      "id": "eu_quero",
+      "label": "Eu quero",
+      "emoji": "🙋",
+      "cat": "verbo"
+    },
+    {
+      "id": "nao_quero",
+      "label": "Não quero",
+      "emoji": "🙅",
+      "cat": "verbo"
+    },
+    {
+      "id": "ajuda",
+      "label": "Ajuda",
+      "emoji": "🆘",
+      "cat": "social",
+      "spoken": "Preciso de ajuda",
+      "np": "ajuda"
+    },
+    {
+      "id": "terminei",
+      "label": "Terminei",
+      "emoji": "✅",
+      "cat": "verbo",
+      "spoken": "Terminei!"
+    },
+    {
+      "id": "mais",
+      "label": "Mais",
+      "emoji": "➕",
+      "cat": "resposta",
+      "spoken": "Mais"
+    },
+    {
+      "id": "acabou",
+      "label": "Acabou",
+      "emoji": "🏁",
+      "cat": "resposta",
+      "spoken": "Acabou"
+    },
+    {
+      "id": "sim",
+      "label": "Sim",
+      "emoji": "👍",
+      "cat": "resposta",
+      "spoken": "Sim"
+    },
+    {
+      "id": "nao",
+      "label": "Não",
+      "emoji": "👎",
+      "cat": "resposta",
+      "spoken": "Não"
+    },
+    {
+      "id": "oi",
+      "label": "Oi",
+      "emoji": "👋",
+      "cat": "social",
+      "spoken": "Oi!"
+    },
+    {
+      "id": "tchau",
+      "label": "Tchau",
+      "emoji": "🤚",
+      "cat": "social",
+      "spoken": "Tchau!"
+    },
+    {
+      "id": "obrigado",
+      "label": "Obrigado",
+      "emoji": "🙏",
+      "cat": "social",
+      "spoken": "Obrigado!"
+    },
+    {
+      "id": "por_favor",
+      "label": "Por favor",
+      "emoji": "🥺",
+      "cat": "social",
+      "spoken": "Por favor"
+    },
+    {
+      "id": "professora",
+      "label": "Professora",
+      "emoji": "👩‍🏫",
+      "cat": "pessoa",
+      "np": "a professora",
+      "bare": "professora"
+    },
+    {
+      "id": "mamae",
+      "label": "Mamãe",
+      "emoji": "👩",
+      "cat": "pessoa",
+      "np": "a mamãe",
+      "bare": "mamãe"
+    },
+    {
+      "id": "amigo",
+      "label": "Amigo",
+      "emoji": "🧒",
+      "cat": "pessoa",
+      "np": "o amigo",
+      "bare": "amigo"
+    },
+    {
+      "id": "feliz",
+      "label": "Feliz",
+      "emoji": "😀",
+      "cat": "sentir",
+      "spoken": "Estou feliz"
+    },
+    {
+      "id": "triste",
+      "label": "Triste",
+      "emoji": "😢",
+      "cat": "sentir",
+      "spoken": "Estou triste"
+    },
+    {
+      "id": "cansado",
+      "label": "Cansado",
+      "emoji": "😴",
+      "cat": "sentir",
+      "spoken": "Estou cansado"
+    },
+    {
+      "id": "bravo",
+      "label": "Bravo",
+      "emoji": "😠",
+      "cat": "sentir",
+      "spoken": "Estou bravo"
+    },
+    {
+      "id": "medo",
+      "label": "Medo",
+      "emoji": "😨",
+      "cat": "sentir",
+      "spoken": "Estou com medo"
+    },
+    {
+      "id": "dor",
+      "label": "Dor",
+      "emoji": "🤕",
+      "cat": "sentir",
+      "spoken": "Estou com dor"
+    },
+    {
+      "id": "barriga",
+      "label": "Barriga",
+      "emoji": "🤰",
+      "cat": "sentir",
+      "loc": "na barriga",
+      "img": "/static/icons/barriga.svg"
+    },
+    {
+      "id": "cabeca",
+      "label": "Cabeça",
+      "emoji": "🤯",
+      "cat": "sentir",
+      "loc": "na cabeça",
+      "img": "/static/icons/cabeca.svg"
+    },
+    {
+      "id": "banheiro",
+      "label": "Banheiro",
+      "emoji": "🚽",
+      "cat": "objeto",
+      "spoken": "Preciso ir ao banheiro",
+      "np": "o banheiro",
+      "bare": "banheiro"
+    },
+    {
+      "id": "agua",
+      "label": "Água",
+      "emoji": "💧",
+      "cat": "objeto",
+      "np": "água",
+      "bare": "água"
+    },
+    {
+      "id": "lanche",
+      "label": "Lanche",
+      "emoji": "🥪",
+      "cat": "objeto",
+      "np": "o lanche",
+      "bare": "lanche"
+    },
+    {
+      "id": "copo",
+      "label": "Copo",
+      "emoji": "🥤",
+      "cat": "objeto",
+      "np": "o copo",
+      "bare": "copo"
+    },
+    {
+      "id": "garrafa",
+      "label": "Garrafa",
+      "emoji": "🧴",
+      "cat": "objeto",
+      "np": "a garrafa",
+      "bare": "garrafa"
+    },
+    {
+      "id": "maca",
+      "label": "Maçã",
+      "emoji": "🍎",
+      "cat": "objeto",
+      "np": "a maçã",
+      "bare": "maçã"
+    },
+    {
+      "id": "banana",
+      "label": "Banana",
+      "emoji": "🍌",
+      "cat": "objeto",
+      "np": "a banana",
+      "bare": "banana"
+    },
+    {
+      "id": "livro",
+      "label": "Livro",
+      "emoji": "📖",
+      "cat": "objeto",
+      "np": "o livro",
+      "bare": "livro"
+    },
+    {
+      "id": "lapis",
+      "label": "Lápis",
+      "emoji": "✏️",
+      "cat": "objeto",
+      "np": "o lápis",
+      "bare": "lápis"
+    },
+    {
+      "id": "caderno",
+      "label": "Caderno",
+      "emoji": "📓",
+      "cat": "objeto",
+      "np": "o caderno",
+      "bare": "caderno"
+    },
+    {
+      "id": "mochila",
+      "label": "Mochila",
+      "emoji": "🎒",
+      "cat": "objeto",
+      "np": "a mochila",
+      "bare": "mochila"
+    },
+    {
+      "id": "tesoura",
+      "label": "Tesoura",
+      "emoji": "✂️",
+      "cat": "objeto",
+      "np": "a tesoura",
+      "bare": "tesoura"
+    },
+    {
+      "id": "bola",
+      "label": "Bola",
+      "emoji": "⚽",
+      "cat": "objeto",
+      "np": "a bola",
+      "bare": "bola"
+    },
+    {
+      "id": "ursinho",
+      "label": "Ursinho",
+      "emoji": "🧸",
+      "cat": "objeto",
+      "np": "o ursinho",
+      "bare": "ursinho"
+    },
+    {
+      "id": "cadeira",
+      "label": "Cadeira",
+      "emoji": "🪑",
+      "cat": "objeto",
+      "np": "a cadeira",
+      "bare": "cadeira"
+    },
+    {
+      "id": "atividade",
+      "label": "Atividade",
+      "emoji": "📝",
+      "cat": "objeto",
+      "np": "a atividade",
+      "bare": "atividade"
+    },
+    {
+      "id": "brincar",
+      "label": "Brincar",
+      "emoji": "🧩",
+      "cat": "verbo",
+      "inf": "brincar"
+    },
+    {
+      "id": "comer",
+      "label": "Comer",
+      "emoji": "🍽️",
+      "cat": "verbo",
+      "inf": "comer"
+    },
+    {
+      "id": "beber",
+      "label": "Beber",
+      "emoji": "🥛",
+      "cat": "verbo",
+      "inf": "beber"
+    },
+    {
+      "id": "desenhar",
+      "label": "Desenhar",
+      "emoji": "🖍️",
+      "cat": "verbo",
+      "inf": "desenhar"
+    }
+  ],
+  "rotinas": {
+    "chegada": {
+      "nome": "Chegada",
+      "emoji": "🏫",
+      "cards": [
+        "oi",
+        "professora",
+        "amigo",
+        "mamae",
+        "feliz",
+        "cansado",
+        "triste",
+        "mochila",
+        "cadeira"
+      ]
+    },
+    "atividade": {
+      "nome": "Atividade",
+      "emoji": "📝",
+      "cards": [
+        "eu_quero",
+        "lapis",
+        "caderno",
+        "livro",
+        "tesoura",
+        "desenhar",
+        "terminei",
+        "nao_quero",
+        "ajuda"
+      ]
+    },
+    "lanche": {
+      "nome": "Lanche",
+      "emoji": "🥪",
+      "cards": [
+        "eu_quero",
+        "lanche",
+        "agua",
+        "copo",
+        "maca",
+        "banana",
+        "mais",
+        "acabou",
+        "nao_quero"
+      ]
+    },
+    "banheiro": {
+      "nome": "Banheiro",
+      "emoji": "🚽",
+      "cards": [
+        "banheiro",
+        "dor",
+        "barriga",
+        "cabeca",
+        "ajuda",
+        "terminei",
+        "obrigado"
+      ]
+    },
+    "brincar": {
+      "nome": "Brincar",
+      "emoji": "🧩",
+      "cards": [
+        "eu_quero",
+        "brincar",
+        "bola",
+        "ursinho",
+        "amigo",
+        "mais",
+        "acabou",
+        "nao_quero",
+        "feliz"
+      ]
+    },
+    "sentimentos": {
+      "nome": "Sentir",
+      "emoji": "😀",
+      "cards": [
+        "feliz",
+        "triste",
+        "cansado",
+        "bravo",
+        "medo",
+        "dor",
+        "barriga",
+        "cabeca",
+        "ajuda"
+      ]
+    },
+    "saida": {
+      "nome": "Saída",
+      "emoji": "👋",
+      "cards": [
+        "tchau",
+        "professora",
+        "amigo",
+        "mamae",
+        "obrigado",
+        "mochila",
+        "terminei"
+      ]
+    }
+  },
+  "sempre_visiveis": [
+    "sim",
+    "nao",
+    "ajuda",
+    "banheiro"
+  ],
+  "objetos_coco": {
+    "cup": "copo",
+    "bottle": "garrafa",
+    "book": "livro",
+    "backpack": "mochila",
+    "apple": "maca",
+    "banana": "banana",
+    "scissors": "tesoura",
+    "chair": "cadeira",
+    "sandwich": "lanche",
+    "toilet": "banheiro",
+    "sports ball": "bola",
+    "teddy bear": "ursinho"
+  }
+}

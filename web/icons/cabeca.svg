@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Cabeça">
+  <path d="M18 96c0-18 14-28 32-28s32 10 32 28z" fill="#CFD8DC" stroke="#78909C" stroke-width="2.5"/>
+  <rect x="43" y="58" width="14" height="14" rx="4" fill="#CFD8DC" stroke="#78909C" stroke-width="2.5"/>
+  <circle cx="50" cy="38" r="27" fill="#CFD8DC" stroke="#78909C" stroke-width="2.5"/>
+  <circle cx="41" cy="40" r="2.6" fill="#546E7A"/><circle cx="59" cy="40" r="2.6" fill="#546E7A"/>
+  <path d="M42 51q8 6 16 0" fill="none" stroke="#546E7A" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="50" cy="20" r="10" fill="#E53935" stroke="#fff" stroke-width="3"/>
+  <path d="M50 4v-0M30 8l-5-5M70 8l5-5M50 6V1" stroke="#E53935" stroke-width="3" stroke-linecap="round"/>
+</svg>

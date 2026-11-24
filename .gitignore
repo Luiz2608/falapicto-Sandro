@@ -1,0 +1,25 @@
+# Ambiente virtual e cache Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Modelos pesados (> 100 MB, limite do GitHub) e pesos base baixados automaticamente
+models/*.gguf
+yolov8n.pt
+models/yolov8n.pt
+
+# Datasets brutos, imagens de treino e arquivos compactados
+*.zip
+baixados/
+yolo_final/
+fotos/
+runs/
+
+# Uploads e backups locais de runtime
+data/uploads/
+data/*.bak
+data/*.tmp
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db

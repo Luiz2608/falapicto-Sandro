@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+httpx
+python-multipart
+pillow
+numpy
+# opcionais:
+# torch            (LSTM de próximo card; sem ele a API usa N-gram)
+# ultralytics      (YOLO para /api/detect)

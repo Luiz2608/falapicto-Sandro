@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>FalaPicto</title>
+<link rel="icon" href="/static/icons/icon-192.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#FFD93D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+<style>
+  :root { --bg:#FFFBF2; --ink:#2B2B2B; --card:#fff; --ok:#2FB864; --warn:#FF9F45; --cam:#4D96FF; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; user-select:none; touch-action: manipulation; }
+  #app { display:grid; height:100dvh; grid-template-rows: auto 1fr auto; gap:10px; padding:10px; }
+
+  /* faixa de frase */
+  #strip { display:grid; grid-template-columns: 1fr auto auto auto; gap:10px; align-items:stretch; }
+  #sentence { background:#fff; border:4px solid #E8E0CF; border-radius:22px; min-height:104px; padding:8px 12px;
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center; overflow:hidden; }
+  #sentence .hint { color:#9a917c; font-size:1.3rem; }
+  .chip { display:flex; flex-direction:column; align-items:center; justify-content:center; width:86px; height:86px;
+    border-radius:16px; border:4px solid; background:#fff; font-size:2.4rem; line-height:1; }
+  .chip small { font-size:.85rem; margin-top:2px; font-weight:700; }
+  .big { border:none; border-radius:22px; font-size:1.6rem; font-weight:800; color:#fff; padding:0 22px; min-width:150px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; }
+  .big span { font-size:2.4rem; line-height:1; }
+  #btnSpeak { background:var(--ok); } #btnUndo { background:var(--warn); min-width:120px; } #btnClear { background:#E75A5A; min-width:120px; }
+  .big:active { transform:scale(.96); }
+  #frase { position:absolute; left:-9999px; }
+
+  /* meio */
+  #mid { display:grid; grid-template-columns: 1fr 150px; gap:10px; min-height:0; }
+  /* grade fixa 3x3: tamanho e posição previsíveis (planejamento motor) */
+  #board { display:grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    gap:12px; min-height:0; }
+  #fixed { display:grid; grid-template-rows: repeat(4, 1fr); gap:12px; }
+  .card { position:relative; background:var(--card); border:6px solid; border-radius:24px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; min-height:0; }
+  .card .em { font-size:clamp(2.6rem, 8vh, 4.6rem); line-height:1; }
+  .card .lb { font-size:clamp(1.1rem, 3vh, 1.6rem); font-weight:800; }
+  .card .em img { height:clamp(3rem, 10vh, 5.2rem); width:auto; max-width:100%; object-fit:contain; display:block; }
+  .chip img { height:46px; width:auto; max-width:72px; object-fit:contain; }
+  .card:active { transform:scale(.95); filter:brightness(.95); }
+  .card.sug { box-shadow:0 0 0 6px rgba(47,184,100,.45); animation:pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { box-shadow:0 0 0 12px rgba(47,184,100,.18); } }
+  @media (prefers-reduced-motion: reduce) { .card.sug { animation:none; } }
+
+  /* rodapé */
+  #bar { display:flex; gap:10px; }
+  .tab { flex:1; background:#fff; border:4px solid #E8E0CF; border-radius:20px; font-size:1.15rem; font-weight:800; padding:6px 4px;
+    display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; }
+  .tab span { font-size:2rem; line-height:1; }
+  .tab.on { border-color:#2B2B2B; background:#FFF1C9; }
+  #btnCam { flex:0 0 150px; background:var(--cam); color:#fff; border:none; border-radius:20px; font-weight:800; font-size:1.15rem;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; }
+  #btnCam span { font-size:2.2rem; }
+
+  /* câmera */
+  #cam { position:fixed; inset:0; background:#111; display:none; flex-direction:column; z-index:10; }
+  #cam.on { display:flex; }
+  #vwrap { position:relative; flex:1; min-height:0; background:#000; }
+  #video { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+  #ov { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #camBar { display:flex; gap:12px; padding:12px; background:#1c1c1c; align-items:center; min-height:140px; }
+  #camBar .big { min-width:170px; height:110px; }
+  #sentence .frase { flex:1; min-width:180px; font-size:clamp(1.3rem,4vh,2rem); font-weight:800; color:#1d6b3b; padding-left:6px; }
+  #found { flex:1; display:flex; gap:12px; overflow:auto; align-items:center; }
+  #found .card { width:130px; height:110px; flex:0 0 auto; }
+  #camMsg { color:#fff; font-size:1.3rem; }
+  #toast { position:fixed; left:50%; bottom:110px; transform:translateX(-50%); background:#2B2B2B; color:#fff; padding:12px 22px;
+    border-radius:16px; font-size:1.2rem; opacity:0; transition:opacity .2s; pointer-events:none; z-index:20; }
+  #toast.on { opacity:1; }
+
+  @media (max-width: 700px) {
+    #mid { grid-template-columns: 1fr; } #fixed { grid-template-rows:none; grid-template-columns:repeat(4,1fr); height:92px; }
+    .big, #btnUndo, #btnClear { min-width:74px; padding:0 8px; font-size:1.05rem; } .chip { width:66px; height:66px; font-size:1.8rem; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="strip">
+    <div id="sentence" aria-live="polite"></div>
+    <button class="big" id="btnUndo" aria-label="Desfazer"><span>↩️</span>Voltar</button>
+    <button class="big" id="btnClear" aria-label="Limpar frase"><span>🗑️</span>Limpar</button>
+    <button class="big" id="btnSpeak" aria-label="Falar a frase"><span>🔊</span>Falar</button>
+  </div>
+  <div id="mid">
+    <div id="board" role="list"></div>
+    <div id="fixed"></div>
+  </div>
+  <div id="bar"></div>
+</div>
+
+<div id="cam">
+  <div id="vwrap"><video id="video" autoplay playsinline muted></video><canvas id="ov"></canvas></div>
+  <div id="camBar">
+    <div id="found"><div id="camMsg">Aponte para um objeto…</div></div>
+    <button class="big" id="btnClose" style="background:#777"><span>✖️</span>Fechar</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+let CFG, rotina = "lanche", seq = [], hist = [], sugestoes = [];   // hist = cards da última frase falada (memória da sessão)
+let voz = null, resultado = null;   // resultado = {ordem, frase} da última frase falada (mostra a ordem correta)
+
+// ---------- fala ----------
+function carregarVoz() {
+  const vs = speechSynthesis.getVoices();
+  voz = vs.find(v => v.lang === "pt-BR") || vs.find(v => v.lang.startsWith("pt")) || null;
+}
+if ("speechSynthesis" in window) { speechSynthesis.onvoiceschanged = carregarVoz; carregarVoz(); }
+function falar(txt) {
+  if (!("speechSynthesis" in window) || !txt) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang = "pt-BR"; if (voz) u.voice = voz; u.rate = 0.9; speechSynthesis.speak(u);
+}
+function toast(t) { const e = $("#toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 1800); }
+
+// ---------- dados ----------
+const card = id => CFG.cards.find(c => c.id === id);
+const cor = c => c.cor || CFG.categories[c.cat].cor;
+const fundo = c => cor(c) + "47";   // cor da categoria com transparência: fundo colorido e texto legível
+const icone = c => c.img ? `<img src="${c.img}" alt="" draggable="false">` : c.emoji;
+const nomeFalado = c => c.spoken || c.label;
+
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+  return r.json();
+}
+
+// ---------- desenho ----------
+function cardEl(c, extra = "") {
+  const d = document.createElement("button");
+  d.className = "card " + extra; d.style.borderColor = cor(c); d.style.background = fundo(c); d.setAttribute("role", "listitem"); d.setAttribute("aria-label", c.label);
+  d.innerHTML = `<div class="em">${icone(c)}</div><div class="lb">${c.label}</div>`;
+  return d;
+}
+function desenhar() {
+  const board = $("#board"); board.innerHTML = "";
+  CFG.rotinas[rotina].cards.forEach(id => {
+    const c = card(id);
+    const el = cardEl(c, sugestoes.includes(id) ? "sug" : "");   // posições FIXAS; só destaca (planejamento motor)
+    el.onclick = () => tocar(id);
+    board.appendChild(el);
+  });
+  const fx = $("#fixed"); fx.innerHTML = "";
+  CFG.sempre_visiveis.forEach(id => { const el = cardEl(card(id)); el.onclick = () => tocar(id); fx.appendChild(el); });
+  const bar = $("#bar"); bar.innerHTML = "";
+  Object.entries(CFG.rotinas).forEach(([k, r]) => {
+    const t = document.createElement("button"); t.className = "tab" + (k === rotina ? " on" : "");
+    t.innerHTML = `<span>${r.emoji}</span>${r.nome}`; t.onclick = () => { rotina = k; hist = []; atualizarSugestoes(); }; bar.appendChild(t);
+  });
+  const cb = document.createElement("button"); cb.id = "btnCam"; cb.innerHTML = "<span>📷</span>Câmera"; cb.onclick = abrirCamera; bar.appendChild(cb);
+
+  const s = $("#sentence"); s.innerHTML = "";
+  if (!seq.length && !resultado) s.innerHTML = '<span class="hint">Toque nas figuras e depois em Falar…</span>';
+  (seq.length ? seq : (resultado ? resultado.ordem : [])).forEach(id => { const c = card(id); const e = document.createElement("div"); e.className = "chip"; e.style.borderColor = cor(c); e.style.background = fundo(c);
+    e.innerHTML = `${icone(c)}<small>${c.label}</small>`; s.appendChild(e); });
+  if (!seq.length && resultado) { const f = document.createElement("div"); f.className = "frase"; f.textContent = resultado.frase; s.appendChild(f); }
+}
+
+// ---------- ações ----------
+async function atualizarSugestoes() {
+  try { sugestoes = (await api("/api/next", { rotina, seq: hist.concat(seq), k: 4 })).sugestoes; } catch { sugestoes = []; }
+  desenhar();
+}
+// Tocar num card só ADICIONA à frase. Quem fala é o botão "Falar".
+function tocar(id) { resultado = null; seq.push(id); atualizarSugestoes(); }
+$("#btnUndo").onclick = () => { if (!seq.length) return; seq.pop(); atualizarSugestoes(); };
+$("#btnClear").onclick = () => {
+  if (!seq.length && !resultado) return;
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  seq = []; resultado = null; atualizarSugestoes();
+};
+$("#btnSpeak").onclick = async () => {
+  if (!seq.length) {
+    if (resultado && resultado.frase) falar(resultado.frase);
+    return;
+  }
+  const r = await api("/api/speak", { seq, contexto: hist });
+  falar(r.frase);
+  resultado = { ordem: r.ordem || seq.slice(), frase: r.frase };   // mostra a frase certa e as figuras na ordem certa
+  hist = (r.ordem || seq).slice(); seq = []; atualizarSugestoes();
+};
+
+// ---------- câmera: reconhece sozinha e escreve o nome + ícone em cima do objeto ----------
+let stream = null, camLoop = null, camOn = false, dets = [];   // dets = [{card, box, t}]
+const imgCache = {};
+function imgDe(src) { if (!imgCache[src]) { const i = new Image(); i.src = src; imgCache[src] = i; } return imgCache[src]; }
+
+async function abrirCamera() {
+  $("#cam").classList.add("on"); dets = []; camOn = true; $("#found").innerHTML = '<div id="camMsg">Aponte para um objeto…</div>';
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    $("#video").srcObject = stream;
+    camLoop = setInterval(desenharOverlay, 120);
+    detectarLoop();
+  } catch { $("#camMsg").textContent = "Não consegui abrir a câmera (precisa de https e permissão)."; }
+}
+function fecharCamera() {
+  camOn = false; clearInterval(camLoop); $("#cam").classList.remove("on");
+  if (stream) stream.getTracks().forEach(t => t.stop()); stream = null;
+}
+$("#btnClose").onclick = fecharCamera;
+
+async function detectarLoop() {
+  const v = $("#video"), cv = document.createElement("canvas"); let falhas = 0;
+  while (camOn) {
+    const t0 = Date.now();
+    try {
+      if (v.videoWidth) {
+        const k = Math.min(1, 512 / v.videoWidth); cv.width = v.videoWidth * k; cv.height = v.videoHeight * k;
+        cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+        const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", .7));
+        const fd = new FormData(); fd.append("file", blob, "f.jpg");
+        const resp = await fetch("/api/detect", { method: "POST", body: fd });
+        if (!resp.ok) throw new Error("servidor respondeu " + resp.status);
+        const r = await resp.json(); falhas = 0;
+        if (!camOn) break;
+        if (!r.disponivel) { $("#found").innerHTML = `<div id="camMsg">${r.mensagem}</div>`; break; }
+        const agora = Date.now();
+        dets = dets.filter(d => agora - d.t < 1200 && !r.objetos.some(o => o.card === d.card));   // some se ficou 1,2 s sem aparecer
+        r.objetos.forEach(o => dets.push({ card: o.card, box: o.box, t: agora }));
+        listarEncontrados();
+      }
+    } catch (e) {
+      falhas++; console.error("detect:", e);
+      if (camOn && falhas >= 3) $("#found").innerHTML = `<div id="camMsg">Sem conexão com o servidor (${e.message}). Tentando de novo…</div>`;
+    }
+    await new Promise(r => setTimeout(r, Math.max(0, 450 - (Date.now() - t0))));
+  }
+}
+
+function listarEncontrados() {
+  const f = $("#found"); f.innerHTML = "";
+  if (!dets.length) { f.innerHTML = '<div id="camMsg">Aponte para um objeto…</div>'; return; }
+  dets.forEach(d => {
+    const c = card(d.card); const el = cardEl(c);
+    el.onclick = () => { resultado = null; seq.push(d.card); fecharCamera(); atualizarSugestoes(); };   // toque = coloca na frase (não fala)
+    f.appendChild(el);
+  });
+}
+
+function desenharOverlay() {
+  const v = $("#video"), ov = $("#ov"), W = ov.clientWidth, H = ov.clientHeight;
+  if (ov.width !== W || ov.height !== H) { ov.width = W; ov.height = H; }
+  const g = ov.getContext("2d"); g.clearRect(0, 0, W, H);
+  if (!v.videoWidth) return;
+  const esc = Math.min(W / v.videoWidth, H / v.videoHeight), w = v.videoWidth * esc, h = v.videoHeight * esc, ox = (W - w) / 2, oy = (H - h) / 2;
+  dets.forEach(d => {
+    const c = card(d.card); if (!c) return;
+    const [x1, y1, x2, y2] = d.box, x = ox + x1 * w, y = oy + y1 * h, bw = (x2 - x1) * w, bh = (y2 - y1) * h;
+    g.lineWidth = 6; g.strokeStyle = cor(c); g.strokeRect(x, y, bw, bh);
+    const tam = Math.max(28, Math.min(48, bw / 4)); g.font = `800 ${tam * .8}px sans-serif`;
+    const txt = c.label, tw = g.measureText(txt).width, th = tam * 1.3, tx = Math.max(0, Math.min(x, W - tw - tam * 1.6)), ty = Math.max(0, y - th);
+    g.fillStyle = cor(c); g.beginPath(); g.roundRect(tx, ty, tw + tam * 1.6, th, 12); g.fill();
+    if (c.img) { const im = imgDe(c.img); if (im.complete && im.naturalWidth) g.drawImage(im, tx + 6, ty + 4, tam, tam); }
+    else { g.fillStyle = "#000"; g.font = `${tam * .85}px sans-serif`; g.textBaseline = "middle"; g.fillText(c.emoji, tx + 6, ty + th / 2); }
+    g.font = `800 ${tam * .8}px sans-serif`; g.fillStyle = "#111"; g.textBaseline = "middle"; g.fillText(txt, tx + tam * 1.3, ty + th / 2);
+  });
+}
+
+(async () => { CFG = await api("/api/config"); await atualizarSugestoes(); })();
+</script>
+</body>
+</html>

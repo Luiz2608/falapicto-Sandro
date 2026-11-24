@@ -1,0 +1,137 @@
+﻿Voc├¬ ├® o PROFESSOR de um modelo pequeno que ajuda crian├ºas com dificuldade de fala (comunica├º├úo alternativa) na escola.
+Abaixo h├í 120 combina├º├Áes de cards que a crian├ºa tocou, em ordem. Para CADA uma, escreva UMA frase curta (at├® 12 palavras),
+natural, correta, em portugu├¬s do Brasil, na 1┬¬ pessoa, como a crian├ºa falaria.
+
+REGRAS:
+- Use apenas o que est├í nos cards. N├úo invente sintomas, pedidos, pessoas ou lugares.
+- Conserte a gram├ítica: artigos (um/uma/o/a), preposi├º├Áes ("um copo DE ├ígua", "dor NA barriga", "preciso DE ajuda"), concord├óncia.
+- "Eu quero" + copo + ├ígua => "Eu quero um copo de ├ígua."   |   dor + cabe├ºa => "Minha cabe├ºa est├í doendo."   |   dor + barriga => "Minha barriga est├í doendo."
+- Se a combina├º├úo for estranha, devolva a frase mais simples e segura poss├¡vel com os cards, sem inventar nada.
+- Sem nomes reais, telefones ou dados pessoais. Sem explica├º├Áes, sem numera├º├úo, sem markdown.
+
+FORMATO: uma linha por combina├º├úo, EXATAMENTE assim (repita o texto "Cards: ..." id├¬ntico ao que recebeu, depois " => " e a frase):
+Cards: Eu quero, Copo, ├ügua => Eu quero um copo de ├ígua.
+Cards: Dor, Cabe├ºa => Minha cabe├ºa est├í doendo.
+
+COMBINA├ç├òES:
+Cards: Eu quero, Comer
+Cards: Eu quero, Mais, Atividade
+Cards: Dor, Barriga
+Cards: N├úo quero, Atividade, Garrafa
+Cards: N├úo quero, Banana
+Cards: Bravo, Medo
+Cards: Oi, Mam├úe
+Cards: Eu quero, Mais, Garrafa
+Cards: Obrigado, Amigo
+Cards: Eu quero, Mais, Banheiro
+Cards: Eu quero, ├ügua, Garrafa
+Cards: Terminei, L├ípis
+Cards: Eu quero, Amigo
+Cards: Mam├úe, Bravo
+Cards: Eu quero, Mais, Cadeira
+Cards: Triste, Cansado
+Cards: Eu quero, Garrafa
+Cards: Eu quero, Mam├úe
+Cards: Bravo, Cansado
+Cards: Eu quero, Bola, Caderno, Por favor
+Cards: Eu quero, Mais, Ursinho
+Cards: N├úo quero, Mochila, Atividade
+Cards: Feliz, Mam├úe
+Cards: Eu quero, Banana, Mochila
+Cards: Oi, Amigo
+Cards: Eu quero, Brincar
+Cards: Eu quero, Atividade
+Cards: Eu quero, Lanche
+Cards: Eu quero, Garrafa, Banheiro, Por favor
+Cards: Eu quero, Desenhar, Copo
+Cards: Eu quero, ├ügua
+Cards: Eu quero, Mais, Mochila
+Cards: N├úo quero, L├ípis
+Cards: Eu quero, Professora
+Cards: Eu quero, Brincar, Copo
+Cards: N├úo quero, ├ügua, Copo
+Cards: Cansado, Medo
+Cards: Bravo, Mam├úe
+Cards: Eu quero, Bola, Mochila, Por favor
+Cards: N├úo quero, Desenhar
+Cards: Medo, Cansado
+Cards: Eu quero, Livro, Cadeira, Por favor
+Cards: Eu quero, Beber, Caderno
+Cards: N├úo quero, Banheiro
+Cards: Terminei, Mochila
+Cards: Eu quero, Mochila
+Cards: Eu quero, Tesoura, Caderno, Por favor
+Cards: Ajuda, Atividade
+Cards: Professora, Cansado
+Cards: Eu quero, Desenhar
+Cards: Eu quero, Beber, Ma├º├ú
+Cards: Ajuda, Amigo
+Cards: Eu quero, Banheiro, Caderno
+Cards: Dor, Barriga, Cabe├ºa
+Cards: Terminei, Livro
+Cards: Amigo, Triste
+Cards: Eu quero, Ma├º├ú, ├ügua, Por favor
+Cards: Eu quero, Comer, Cadeira
+Cards: Eu quero, Banana
+Cards: Eu quero, Comer, L├ípis
+Cards: Eu quero, Brincar, Tesoura
+Cards: N├úo quero, Ursinho, Garrafa
+Cards: Eu quero, Ursinho, Garrafa, Por favor
+Cards: Eu quero, Ursinho, Banheiro, Por favor
+Cards: Professora, Triste
+Cards: Eu quero, Ursinho
+Cards: N├úo quero, Livro
+Cards: Eu quero, Cadeira
+Cards: Ajuda, Caderno
+Cards: Feliz, Triste
+Cards: Bravo, Amigo
+Cards: Ajuda, Ma├º├ú
+Cards: Dor, Cabe├ºa
+Cards: Eu quero, Copo
+Cards: Eu quero, Beber, Atividade
+Cards: Terminei, ├ügua
+Cards: Eu quero, Mais, Banana
+Cards: Eu quero, Copo, Lanche
+Cards: Eu quero, Beber
+Cards: Professora, Feliz
+Cards: Obrigado, Professora
+Cards: Ajuda, Professora
+Cards: Terminei, Banheiro
+Cards: Tchau, Professora
+Cards: N├úo quero, Atividade
+Cards: Eu quero, Beber, Lanche
+Cards: Eu quero, Mais, Bola
+Cards: N├úo quero, Tesoura, Garrafa
+Cards: Eu quero, Mochila, Banana
+Cards: Eu quero, Banheiro, Tesoura
+Cards: Ajuda, Lanche
+Cards: N├úo quero, ├ügua
+Cards: Ajuda, Mam├úe
+Cards: Eu quero, Ursinho, Livro, Por favor
+Cards: N├úo quero, Beber
+Cards: Eu quero, Garrafa, Cadeira
+Cards: Eu quero, Mais, L├ípis
+Cards: Eu quero, Copo, Ursinho
+Cards: Ajuda, Bola
+Cards: N├úo quero, Copo
+Cards: Eu quero, Bola
+Cards: Eu quero, Banheiro, Ma├º├ú
+Cards: Dor, Cabe├ºa, Barriga
+Cards: Eu quero, Copo, Cadeira
+Cards: N├úo quero, Comer
+Cards: Eu quero, Comer, Lanche
+Cards: Amigo, Bravo
+Cards: Eu quero, Atividade, Lanche, Por favor
+Cards: Eu quero, Atividade, Tesoura
+Cards: N├úo quero, Cadeira
+Cards: N├úo quero, Ma├º├ú, Lanche
+Cards: Eu quero, Mochila, Cadeira
+Cards: N├úo quero, L├ípis, Cadeira
+Cards: Eu quero, Banheiro, Garrafa
+Cards: Eu quero, Tesoura, Copo
+Cards: Eu quero, Comer, Ursinho
+Cards: Eu quero, Banheiro, Livro
+Cards: Feliz, Bravo
+Cards: Mam├úe, Triste
+Cards: Cansado, Professora
+

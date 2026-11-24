@@ -1,0 +1,16 @@
+.venv
+__pycache__
+*.pyc
+.git
+*.zip
+models/*.gguf
+fotos
+data/uploads
+docs
+*.ipynb
+prompt*.txt
+lote*.txt
+
+baixados
+yolo_final
+runs

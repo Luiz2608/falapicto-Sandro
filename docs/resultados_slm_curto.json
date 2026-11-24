@@ -1,0 +1,222 @@
+[
+  {
+    "modelo": "curto f16",
+    "mb": 1198.18304,
+    "exato": 0.7083333333333334,
+    "exato_sem_regra": 0.4,
+    "n_sem_regra": 5,
+    "fiel": 0.8333333333333334,
+    "formato": 1.0,
+    "erros": [
+      [
+        "Cards: Mam\u00e3e, Bravo",
+        "Mam\u00e3e, estou bravo.",
+        "Mam\u00e3e, estou com bravo."
+      ],
+      [
+        "Cards: Eu quero, Garrafa, Lanche",
+        "Eu quero a garrafa e o lanche.",
+        "Eu quero uma garrafa de lanche."
+      ],
+      [
+        "Cards: Ajuda, Amigo",
+        "Amigo, preciso de ajuda.",
+        "Amigo, estou ajudando."
+      ],
+      [
+        "Cards: Banheiro",
+        "Preciso ir ao banheiro.",
+        "Estou no banheiro."
+      ],
+      [
+        "Cards: Eu quero, Mochila, Banana, Por favor",
+        "Eu quero a mochila e a banana, por favor.",
+        "Eu quero uma mochila e uma banana, por favor."
+      ],
+      [
+        "Cards: N\u00e3o quero, Copo",
+        "N\u00e3o quero o copo.",
+        "N\u00e3o quero um copo."
+      ],
+      [
+        "Cards: N\u00e3o quero, Mochila, Atividade",
+        "Eu n\u00e3o quero mochila nem atividade.",
+        "N\u00e3o quero uma mochila e atividade."
+      ]
+    ],
+    "lat_media": 2350.6705291802064,
+    "lat_p95": 2770.649000070989,
+    "tok_s": 8.510805707323197,
+    "n": 24
+  },
+  {
+    "modelo": "curto q8_0",
+    "mb": 639.44768,
+    "exato": 0.7083333333333334,
+    "exato_sem_regra": 0.4,
+    "n_sem_regra": 5,
+    "fiel": 0.8333333333333334,
+    "formato": 1.0,
+    "erros": [
+      [
+        "Cards: Mam\u00e3e, Bravo",
+        "Mam\u00e3e, estou bravo.",
+        "Mam\u00e3e, estou com bravo."
+      ],
+      [
+        "Cards: Eu quero, Garrafa, Lanche",
+        "Eu quero a garrafa e o lanche.",
+        "Eu quero uma garrafa de lanche."
+      ],
+      [
+        "Cards: Ajuda, Amigo",
+        "Amigo, preciso de ajuda.",
+        "Amigo, estou ajudando."
+      ],
+      [
+        "Cards: Banheiro",
+        "Preciso ir ao banheiro.",
+        "Estou no banheiro."
+      ],
+      [
+        "Cards: Eu quero, Mochila, Banana, Por favor",
+        "Eu quero a mochila e a banana, por favor.",
+        "Eu quero uma mochila e uma banana, por favor."
+      ],
+      [
+        "Cards: N\u00e3o quero, Copo",
+        "N\u00e3o quero o copo.",
+        "N\u00e3o quero um copo."
+      ],
+      [
+        "Cards: N\u00e3o quero, Mochila, Atividade",
+        "Eu n\u00e3o quero mochila nem atividade.",
+        "N\u00e3o quero uma mochila e atividade."
+      ]
+    ],
+    "lat_media": 1446.0177124516729,
+    "lat_p95": 1659.3945000786334,
+    "tok_s": 13.883591989225602,
+    "n": 24
+  },
+  {
+    "modelo": "curto q4_k_m",
+    "mb": 396.705408,
+    "exato": 0.7083333333333334,
+    "exato_sem_regra": 0.4,
+    "n_sem_regra": 5,
+    "fiel": 0.875,
+    "formato": 1.0,
+    "erros": [
+      [
+        "Cards: Mam\u00e3e, Bravo",
+        "Mam\u00e3e, estou bravo.",
+        "Mam\u00e3e, estou com o bravo."
+      ],
+      [
+        "Cards: Eu quero, Garrafa, Lanche",
+        "Eu quero a garrafa e o lanche.",
+        "Eu quero uma garrafa de lanche."
+      ],
+      [
+        "Cards: N\u00e3o quero, L\u00e1pis",
+        "N\u00e3o quero o l\u00e1pis.",
+        "N\u00e3o quero l\u00e1pis."
+      ],
+      [
+        "Cards: Banheiro",
+        "Preciso ir ao banheiro.",
+        "Estou no banheiro."
+      ],
+      [
+        "Cards: Eu quero, Mochila, Banana, Por favor",
+        "Eu quero a mochila e a banana, por favor.",
+        "Eu quero uma mochila e uma banana, por favor."
+      ],
+      [
+        "Cards: N\u00e3o quero, Copo",
+        "N\u00e3o quero o copo.",
+        "N\u00e3o quero um copo."
+      ],
+      [
+        "Cards: N\u00e3o quero, Mochila, Atividade",
+        "Eu n\u00e3o quero mochila nem atividade.",
+        "N\u00e3o quero uma mochila e fazer atividade."
+      ]
+    ],
+    "lat_media": 893.9838124885379,
+    "lat_p95": 1100.3608999308199,
+    "tok_s": 22.4826822912134,
+    "n": 24
+  },
+  {
+    "modelo": "com pensamento q4_k_m",
+    "mb": 396.705408,
+    "exato": 0.5416666666666666,
+    "exato_sem_regra": 0.4,
+    "n_sem_regra": 5,
+    "fiel": 0.8333333333333334,
+    "formato": 1.0,
+    "erros": [
+      [
+        "Cards: Terminei, Lanche",
+        "Terminei o lanche.",
+        "Terminei meu lanche."
+      ],
+      [
+        "Cards: Medo",
+        "Estou com medo.",
+        "Eu tenho medo."
+      ],
+      [
+        "Cards: Mam\u00e3e, Bravo",
+        "Mam\u00e3e, estou bravo.",
+        "Mam\u00e3e, bravo!"
+      ],
+      [
+        "Cards: Eu quero, Garrafa, Lanche",
+        "Eu quero a garrafa e o lanche.",
+        "Eu quero uma garrafa de lanche."
+      ],
+      [
+        "Cards: Feliz, Mam\u00e3e",
+        "Mam\u00e3e, estou feliz.",
+        "Estou felizmente sendo mam\u00e3e."
+      ],
+      [
+        "Cards: Ajuda, Amigo",
+        "Amigo, preciso de ajuda.",
+        "Preciso de ajuda com o amido."
+      ],
+      [
+        "Cards: Eu quero, Amigo",
+        "Eu quero o amigo.",
+        "Eu quero amigo."
+      ],
+      [
+        "Cards: Bravo, Amigo",
+        "Amigo, estou bravo.",
+        "Bravo, estou amando voc\u00ea."
+      ],
+      [
+        "Cards: Banheiro",
+        "Preciso ir ao banheiro.",
+        "Pe\u00e7o ao banheiro."
+      ],
+      [
+        "Cards: Eu quero, Mochila, Banana, Por favor",
+        "Eu quero a mochila e a banana, por favor.",
+        "Eu quero uma mochila e uma banana, por favor."
+      ],
+      [
+        "Cards: N\u00e3o quero, Mochila, Atividade",
+        "Eu n\u00e3o quero mochila nem atividade.",
+        "N\u00e3o quero a mochila e n\u00e3o vou a atividade."
+      ]
+    ],
+    "lat_media": 2544.3463708118848,
+    "lat_p95": 2949.9974998179823,
+    "tok_s": 22.685039231666448,
+    "n": 24
+  }
+]

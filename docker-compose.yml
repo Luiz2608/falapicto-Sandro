@@ -1,0 +1,32 @@
+# Uso: ADMIN_PIN=xxxx DOMINIO=meu.dominio.com docker compose up -d
+# Sem domínio (teste local / túnel): use  docker compose up -d api  e o cloudflared (veja DEPLOY.md)
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      ADMIN_PIN: ${ADMIN_PIN:?defina ADMIN_PIN}
+      SLM_URL: ${SLM_URL:-}
+    volumes:
+      - dados:/app/data          # cards, uploads e backups persistem aqui
+    ports:
+      - "127.0.0.1:8000:8000"
+  caddy:                          # https automático (Let's Encrypt)
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [api]
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMINIO: ${DOMINIO:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+  slm:                            # opcional: perfil "slm" (coloque o .gguf em ./models/)
+    profiles: ["slm"]
+    image: ghcr.io/ggml-org/llama.cpp:server
+    restart: unless-stopped
+    command: ["-m", "/models/${SLM_ARQUIVO:-falapicto-q4_k_m.gguf}", "--host", "0.0.0.0", "--port", "8080", "-c", "512"]
+    volumes: ["./models:/models:ro"]
+volumes:
+  dados:
+  caddy_data:
