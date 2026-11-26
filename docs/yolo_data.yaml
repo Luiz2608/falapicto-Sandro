@@ -1,0 +1,13 @@
+# Esquema de classes do YOLOv8n ajustado (transfer learning)
+# Dataset mesclado a partir de conjuntos abertos do Roboflow Universe (CC BY 4.0)
+names:
+  0: lapis
+  1: caneta
+  2: apontador
+  3: borracha
+  4: caderno
+  5: regua
+  6: tesoura
+train: images/train
+val: images/val
+test: images/test

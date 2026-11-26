@@ -1,8 +1,10 @@
-"""FalaPicto API — roda local (sem internet).
-  GET  /               -> app web (web/index.html)
+"""Aponta e Fala (FalaPicto) API — roda local (com tolerância a quedas de rede).
+  GET  /               -> app web PWA (web/index.html)
+  GET  /sw.js          -> Service Worker para cache e modo offline
   GET  /api/config     -> cards, categorias, rotinas
+  GET  /api/ngram      -> tabela N-gram para sugestões offline no navegador
   POST /api/next       -> próximos cards prováveis (LSTM se disponível; senão N-gram)
-  POST /api/speak      -> frase final. ROUTER: regra (rápido) -> SLM (se SLM_URL) -> fallback
+  POST /api/speak      -> frase final. ROUTER: regra -> compositor -> SLM (com circuit breaker e guarda) -> fallback
   POST /api/detect     -> objeto na foto (YOLO) -> card correspondente
 """
 import os, sys, io, json, time, re
@@ -16,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 from core import DATA, CARDS, ROTINAS, ordenar, rule_sentence, lista_sentence, fallback_sentence, sentence_with_context, prompt_messages, extrair_resposta  # noqa: E402
 
-app = FastAPI(title="FalaPicto")
+app = FastAPI(title="Aponta e Fala")
 
 from guarda import verificar  # noqa: E402
 from compor import compor  # noqa: E402
@@ -91,15 +93,34 @@ def predict_next(rotina, seq, k=5):
     return NGRAM.get(f"{rotina}|{prev}", [])[:k], "ngram"
 
 
-# ---------- SLM (opcional) ----------
+# ---------- SLM (opcional, com circuit breaker p/ resiliência) ----------
 SLM_URL = os.environ.get("SLM_URL")  # ex.: http://localhost:8080/v1/chat/completions (llama.cpp server)
+SLM_TIMEOUT = float(os.environ.get("SLM_TIMEOUT", "4.5"))
+SLM_COOLDOWN = float(os.environ.get("SLM_COOLDOWN", "30.0"))
+_slm_state = {"down_until": 0.0, "last_error": None}
+
+
+def _slm_disponivel():
+    return bool(SLM_URL) and time.monotonic() >= _slm_state["down_until"]
 
 
 def slm_sentence(seq):
-    """Mesmo prompt do treino (core.prompt_messages). max_tokens cobre <pensamento>+<resposta>."""
+    """Mesmo prompt do treino (core.prompt_messages). Circuit breaker evita travamentos repetidos."""
     import httpx
-    r = httpx.post(SLM_URL, json={"messages": prompt_messages(seq), "max_tokens": 128, "temperature": 0.0}, timeout=8.0)
-    return extrair_resposta(r.json()["choices"][0]["message"]["content"])
+    try:
+        r = httpx.post(
+            SLM_URL,
+            json={"messages": prompt_messages(seq), "max_tokens": 128, "temperature": 0.0},
+            timeout=SLM_TIMEOUT,
+        )
+        r.raise_for_status()
+        _slm_state["down_until"] = 0.0
+        _slm_state["last_error"] = None
+        return extrair_resposta(r.json()["choices"][0]["message"]["content"])
+    except Exception as e:
+        _slm_state["down_until"] = time.monotonic() + SLM_COOLDOWN
+        _slm_state["last_error"] = str(e)[:120]
+        raise
 
 
 # ---------- modelos de entrada ----------
@@ -118,6 +139,12 @@ class SpeakIn(BaseModel):
 def config():
     return {"cards": DATA["cards"], "categories": DATA["categories"], "rotinas": ROTINAS,
             "sempre_visiveis": DATA["sempre_visiveis"]}
+
+
+@app.get("/api/ngram")
+def ngram():
+    """Tabela compacta de bigramas usada como fallback offline de sugestões no tablet."""
+    return NGRAM
 
 
 @app.post("/api/next")
@@ -143,7 +170,7 @@ def speak(body: SpeakIn):
         if frase: fonte = "compositor"
     if frase is None:
         fonte = "fallback"
-        if SLM_URL:
+        if _slm_disponivel():
             try:
                 frase, fonte = slm_sentence(seq), "slm"
                 motivo = verificar(seq, frase)           # GUARDA: o SLM omitiu ou inventou algo?
@@ -153,6 +180,13 @@ def speak(body: SpeakIn):
                     fonte = f"lista (SLM reprovado: {motivo})" if frase else f"fallback (SLM reprovado: {motivo})"
             except Exception as e:
                 print("SLM falhou, usando fallback:", e)
+                frase = lista_sentence(seq)
+                if frase:
+                    fonte = "lista (SLM indisponível)"
+        else:
+            frase = lista_sentence(seq)
+            if frase:
+                fonte = "lista"
         if not frase:
             frase = fallback_sentence(seq)
     return {"frase": frase, "ordem": seq, "fonte": fonte, "ms": round((time.perf_counter() - t0) * 1000, 2)}
@@ -181,7 +215,7 @@ def _load_yolo():
 def health():
     """Diagnóstico rápido para testar no celular: abra /api/health no navegador do aparelho."""
     return {"ok": True, "yolo": _yolo["model"] is not None, "yolo_extra": _yolo["extra"] is not None, "yolo_erro": _yolo["erro"],
-            "lstm": bool(_lstm["model"]), "slm": bool(SLM_URL), "cards": len(CARDS)}
+            "lstm": bool(_lstm["model"]), "slm": bool(SLM_URL), "slm_online": _slm_disponivel(), "cards": len(CARDS)}
 
 
 def _iou(a, b):
@@ -228,6 +262,15 @@ def detect(file: UploadFile = File(...)):   # def (não async): a inferência ro
 app.mount("/static", StaticFiles(directory=ROOT / "web"), name="static")
 (ROOT / "data" / "uploads").mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=ROOT / "data" / "uploads"), name="uploads")
+
+
+@app.get("/sw.js")
+def service_worker():
+    return FileResponse(
+        ROOT / "web" / "sw.js",
+        media_type="application/javascript",
+        headers={"Cache-Control": "no-cache", "Service-Worker-Allowed": "/"},
+    )
 
 
 @app.get("/manifest.webmanifest")

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>FalaPicto</title>
+<title>Aponta e Fala</title>
 <link rel="icon" href="/static/icons/icon-192.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#FFD93D">
@@ -73,6 +73,11 @@
   #toast { position:fixed; left:50%; bottom:110px; transform:translateX(-50%); background:#2B2B2B; color:#fff; padding:12px 22px;
     border-radius:16px; font-size:1.2rem; opacity:0; transition:opacity .2s; pointer-events:none; z-index:20; }
   #toast.on { opacity:1; }
+  #netBadge { position:fixed; right:14px; top:12px; z-index:15; display:none; align-items:center; gap:7px;
+    padding:6px 12px; border-radius:999px; font-size:.9rem; font-weight:800; background:#2B2B2B; color:#fff;
+    box-shadow:0 3px 10px rgba(0,0,0,.16); pointer-events:none; }
+  #netBadge.off { display:flex; background:#B45309; }
+  #netBadge .dot { width:9px; height:9px; border-radius:50%; background:#FDE68A; }
 
   @media (max-width: 700px) {
     #mid { grid-template-columns: 1fr; } #fixed { grid-template-rows:none; grid-template-columns:repeat(4,1fr); height:92px; }
@@ -102,12 +107,54 @@
     <button class="big" id="btnClose" style="background:#777"><span>✖️</span>Fechar</button>
   </div>
 </div>
+<div id="netBadge" role="status" aria-live="polite"><span class="dot"></span>Modo offline · prancha e voz ativas</div>
 <div id="toast"></div>
 
+<script src="/static/offline-core.js"></script>
 <script>
 const $ = s => document.querySelector(s);
-let CFG, rotina = "lanche", seq = [], hist = [], sugestoes = [];   // hist = cards da última frase falada (memória da sessão)
+const STORE_CFG = "apontaefala_cfg_v1", STORE_NGRAM = "apontaefala_ngram_v1";
+let CFG, CARDS_MAP = {}, NGRAM_LOCAL = {}, rotina = "lanche", seq = [], hist = [], sugestoes = [];   // hist = cards da última frase falada (memória da sessão)
 let voz = null, resultado = null;   // resultado = {ordem, frase} da última frase falada (mostra a ordem correta)
+let servidorOnline = navigator.onLine !== false, reconectarTimer = null;
+
+// Registra Service Worker p/ abertura e uso 100% offline em quedas de internet
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(e => console.warn("SW:", e));
+}
+
+function setStatusRede(online) {
+  const mudou = servidorOnline !== online;
+  servidorOnline = online;
+  $("#netBadge").classList.toggle("off", !online);
+  if (!online) {
+    if (mudou) toast("Sem conexão: usando modo offline (prancha e voz ativas)");
+    if (!reconectarTimer) reconectarTimer = setInterval(verificarConexao, 6000);
+  } else {
+    if (reconectarTimer) { clearInterval(reconectarTimer); reconectarTimer = null; }
+    if (mudou) {
+      toast("Conexão com o servidor restabelecida");
+      atualizarSugestoes();
+    }
+  }
+}
+
+async function verificarConexao() {
+  if (navigator.onLine === false) return;
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 2000);
+  try {
+    const r = await fetch("/api/health", { signal: ctrl.signal, cache: "no-store" });
+    clearTimeout(t);
+    if (r.ok) {
+      setStatusRede(true);
+      sincronizarDadosEmSegundoPlano();
+    }
+  } catch { clearTimeout(t); }
+}
+
+window.addEventListener("offline", () => setStatusRede(false));
+window.addEventListener("online", () => verificarConexao());
 
 // ---------- fala ----------
 function carregarVoz() {
@@ -121,18 +168,51 @@ function falar(txt) {
   const u = new SpeechSynthesisUtterance(txt);
   u.lang = "pt-BR"; if (voz) u.voice = voz; u.rate = 0.9; speechSynthesis.speak(u);
 }
-function toast(t) { const e = $("#toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 1800); }
+function toast(t) { const e = $("#toast"); e.textContent = t; e.classList.add("on"); setTimeout(() => e.classList.remove("on"), 2200); }
 
 // ---------- dados ----------
-const card = id => CFG.cards.find(c => c.id === id);
+function indexarCards() {
+  CARDS_MAP = {};
+  (CFG && CFG.cards || []).forEach(c => { CARDS_MAP[c.id] = c; });
+}
+const card = id => CARDS_MAP[id] || (CFG && CFG.cards.find(c => c.id === id));
 const cor = c => c.cor || CFG.categories[c.cat].cor;
 const fundo = c => cor(c) + "47";   // cor da categoria com transparência: fundo colorido e texto legível
 const icone = c => c.img ? `<img src="${c.img}" alt="" draggable="false">` : c.emoji;
 const nomeFalado = c => c.spoken || c.label;
 
-async function api(path, body) {
-  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
-  return r.json();
+async function api(path, body, timeoutMs = 3500) {
+  if (navigator.onLine === false) { setStatusRede(false); throw new Error("offline"); }
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const opts = body
+      ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctrl.signal }
+      : { signal: ctrl.signal };
+    const r = await fetch(path, opts);
+    clearTimeout(t);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    setStatusRede(true);
+    return await r.json();
+  } catch (e) {
+    clearTimeout(t);
+    setStatusRede(false);
+    throw e;
+  }
+}
+
+async function sincronizarDadosEmSegundoPlano() {
+  try {
+    const novoCfg = await api("/api/config", null, 3000);
+    CFG = novoCfg; indexarCards();
+    try { localStorage.setItem(STORE_CFG, JSON.stringify(CFG)); } catch {}
+    desenhar();
+  } catch {}
+  try {
+    const ng = await api("/api/ngram", null, 3000);
+    NGRAM_LOCAL = ng;
+    try { localStorage.setItem(STORE_NGRAM, JSON.stringify(ng)); } catch {}
+  } catch {}
 }
 
 // ---------- desenho ----------
@@ -143,51 +223,80 @@ function cardEl(c, extra = "") {
   return d;
 }
 function desenhar() {
+  if (!CFG) return;
   const board = $("#board"); board.innerHTML = "";
   CFG.rotinas[rotina].cards.forEach(id => {
-    const c = card(id);
+    const c = card(id); if (!c) return;
     const el = cardEl(c, sugestoes.includes(id) ? "sug" : "");   // posições FIXAS; só destaca (planejamento motor)
     el.onclick = () => tocar(id);
     board.appendChild(el);
   });
   const fx = $("#fixed"); fx.innerHTML = "";
-  CFG.sempre_visiveis.forEach(id => { const el = cardEl(card(id)); el.onclick = () => tocar(id); fx.appendChild(el); });
+  CFG.sempre_visiveis.forEach(id => { const c = card(id); if (!c) return; const el = cardEl(c); el.onclick = () => tocar(id); fx.appendChild(el); });
   const bar = $("#bar"); bar.innerHTML = "";
   Object.entries(CFG.rotinas).forEach(([k, r]) => {
     const t = document.createElement("button"); t.className = "tab" + (k === rotina ? " on" : "");
-    t.innerHTML = `<span>${r.emoji}</span>${r.nome}`; t.onclick = () => { rotina = k; hist = []; atualizarSugestoes(); }; bar.appendChild(t);
+    t.innerHTML = `<span>${r.emoji}</span>${r.nome}`; t.onclick = () => { rotina = k; hist = []; desenhar(); atualizarSugestoes(); }; bar.appendChild(t);
   });
   const cb = document.createElement("button"); cb.id = "btnCam"; cb.innerHTML = "<span>📷</span>Câmera"; cb.onclick = abrirCamera; bar.appendChild(cb);
 
   const s = $("#sentence"); s.innerHTML = "";
   if (!seq.length && !resultado) s.innerHTML = '<span class="hint">Toque nas figuras e depois em Falar…</span>';
-  (seq.length ? seq : (resultado ? resultado.ordem : [])).forEach(id => { const c = card(id); const e = document.createElement("div"); e.className = "chip"; e.style.borderColor = cor(c); e.style.background = fundo(c);
+  (seq.length ? seq : (resultado ? resultado.ordem : [])).forEach(id => { const c = card(id); if (!c) return; const e = document.createElement("div"); e.className = "chip"; e.style.borderColor = cor(c); e.style.background = fundo(c);
     e.innerHTML = `${icone(c)}<small>${c.label}</small>`; s.appendChild(e); });
   if (!seq.length && resultado) { const f = document.createElement("div"); f.className = "frase"; f.textContent = resultado.frase; s.appendChild(f); }
 }
 
-// ---------- ações ----------
+// ---------- ações (interface otimista: nunca trava mesmo com rede instável) ----------
+let sugReqId = 0;
 async function atualizarSugestoes() {
-  try { sugestoes = (await api("/api/next", { rotina, seq: hist.concat(seq), k: 4 })).sugestoes; } catch { sugestoes = []; }
+  const reqId = ++sugReqId;
+  const histSeq = hist.concat(seq);
+  if (!servidorOnline || navigator.onLine === false) {
+    sugestoes = window.ApontaOffline ? ApontaOffline.sugerirOffline(rotina, histSeq, NGRAM_LOCAL, 4) : [];
+    desenhar();
+    return;
+  }
+  try {
+    const r = await api("/api/next", { rotina, seq: histSeq, k: 4 }, 1200);
+    if (reqId !== sugReqId) return;
+    sugestoes = r.sugestoes || [];
+  } catch {
+    if (reqId !== sugReqId) return;
+    sugestoes = window.ApontaOffline ? ApontaOffline.sugerirOffline(rotina, histSeq, NGRAM_LOCAL, 4) : [];
+  }
   desenhar();
 }
-// Tocar num card só ADICIONA à frase. Quem fala é o botão "Falar".
-function tocar(id) { resultado = null; seq.push(id); atualizarSugestoes(); }
-$("#btnUndo").onclick = () => { if (!seq.length) return; seq.pop(); atualizarSugestoes(); };
+// Tocar num card só ADICIONA à frase e redesenha imediatamente (0 ms). Quem fala é o botão "Falar".
+function tocar(id) { resultado = null; seq.push(id); desenhar(); atualizarSugestoes(); }
+$("#btnUndo").onclick = () => { if (!seq.length) return; seq.pop(); desenhar(); atualizarSugestoes(); };
 $("#btnClear").onclick = () => {
   if (!seq.length && !resultado) return;
   if ("speechSynthesis" in window) speechSynthesis.cancel();
-  seq = []; resultado = null; atualizarSugestoes();
+  seq = []; resultado = null; desenhar(); atualizarSugestoes();
 };
 $("#btnSpeak").onclick = async () => {
   if (!seq.length) {
     if (resultado && resultado.frase) falar(resultado.frase);
     return;
   }
-  const r = await api("/api/speak", { seq, contexto: hist });
+  const atual = seq.slice();
+  let r = null;
+  if (servidorOnline && navigator.onLine !== false) {
+    try {
+      r = await api("/api/speak", { seq: atual, contexto: hist }, 4000);
+    } catch {
+      r = null;
+    }
+  }
+  if (!r || !r.frase) {
+    r = window.ApontaOffline
+      ? ApontaOffline.falarOffline(atual, hist, CARDS_MAP)
+      : { frase: atual.map(id => (card(id) ? card(id).label : id)).join(" ") + ".", ordem: atual, fonte: "offline-minimo" };
+  }
   falar(r.frase);
-  resultado = { ordem: r.ordem || seq.slice(), frase: r.frase };   // mostra a frase certa e as figuras na ordem certa
-  hist = (r.ordem || seq).slice(); seq = []; atualizarSugestoes();
+  resultado = { ordem: r.ordem || atual, frase: r.frase };   // mostra a frase certa e as figuras na ordem certa
+  hist = (r.ordem || atual).slice(); seq = []; desenhar(); atualizarSugestoes();
 };
 
 // ---------- câmera: reconhece sozinha e escreve o nome + ícone em cima do objeto ----------
@@ -196,13 +305,16 @@ const imgCache = {};
 function imgDe(src) { if (!imgCache[src]) { const i = new Image(); i.src = src; imgCache[src] = i; } return imgCache[src]; }
 
 async function abrirCamera() {
-  $("#cam").classList.add("on"); dets = []; camOn = true; $("#found").innerHTML = '<div id="camMsg">Aponte para um objeto…</div>';
+  $("#cam").classList.add("on"); dets = []; camOn = true;
+  $("#found").innerHTML = servidorOnline
+    ? '<div id="camMsg">Aponte para um objeto…</div>'
+    : '<div id="camMsg">Sem conexão com o servidor (a prancha de cards continua funcionando offline). Tentando reconectar…</div>';
   try {
     stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
     $("#video").srcObject = stream;
     camLoop = setInterval(desenharOverlay, 120);
     detectarLoop();
-  } catch { $("#camMsg").textContent = "Não consegui abrir a câmera (precisa de https e permissão)."; }
+  } catch { $("#camMsg").textContent = "Não consegui abrir a câmera (precisa de https ou localhost e permissão)."; }
 }
 function fecharCamera() {
   camOn = false; clearInterval(camLoop); $("#cam").classList.remove("on");
@@ -215,14 +327,20 @@ async function detectarLoop() {
   while (camOn) {
     const t0 = Date.now();
     try {
+      if (navigator.onLine === false) throw new Error("sem internet");
       if (v.videoWidth) {
         const k = Math.min(1, 512 / v.videoWidth); cv.width = v.videoWidth * k; cv.height = v.videoHeight * k;
         cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
         const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", .7));
         const fd = new FormData(); fd.append("file", blob, "f.jpg");
-        const resp = await fetch("/api/detect", { method: "POST", body: fd });
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 3500);
+        const resp = await fetch("/api/detect", { method: "POST", body: fd, signal: ctrl.signal });
+        clearTimeout(timer);
         if (!resp.ok) throw new Error("servidor respondeu " + resp.status);
-        const r = await resp.json(); falhas = 0;
+        const r = await resp.json();
+        falhas = 0;
+        setStatusRede(true);
         if (!camOn) break;
         if (!r.disponivel) { $("#found").innerHTML = `<div id="camMsg">${r.mensagem}</div>`; break; }
         const agora = Date.now();
@@ -232,9 +350,14 @@ async function detectarLoop() {
       }
     } catch (e) {
       falhas++; console.error("detect:", e);
-      if (camOn && falhas >= 3) $("#found").innerHTML = `<div id="camMsg">Sem conexão com o servidor (${e.message}). Tentando de novo…</div>`;
+      setStatusRede(false);
+      if (camOn && falhas >= 2) {
+        dets = [];
+        $("#found").innerHTML = '<div id="camMsg">Sem conexão com o servidor — a prancha de cards continua funcionando offline. Reconectando…</div>';
+      }
     }
-    await new Promise(r => setTimeout(r, Math.max(0, 450 - (Date.now() - t0))));
+    const esperaBase = falhas > 0 ? Math.min(4000, 900 * Math.pow(1.6, falhas - 1)) : 450;
+    await new Promise(r => setTimeout(r, Math.max(0, esperaBase - (Date.now() - t0))));
   }
 }
 
@@ -242,8 +365,9 @@ function listarEncontrados() {
   const f = $("#found"); f.innerHTML = "";
   if (!dets.length) { f.innerHTML = '<div id="camMsg">Aponte para um objeto…</div>'; return; }
   dets.forEach(d => {
-    const c = card(d.card); const el = cardEl(c);
-    el.onclick = () => { resultado = null; seq.push(d.card); fecharCamera(); atualizarSugestoes(); };   // toque = coloca na frase (não fala)
+    const c = card(d.card); if (!c) return;
+    const el = cardEl(c);
+    el.onclick = () => { resultado = null; seq.push(d.card); fecharCamera(); desenhar(); atualizarSugestoes(); };   // toque = coloca na frase (não fala)
     f.appendChild(el);
   });
 }
@@ -267,7 +391,29 @@ function desenharOverlay() {
   });
 }
 
-(async () => { CFG = await api("/api/config"); await atualizarSugestoes(); })();
+(async () => {
+  try { const cachedNgram = localStorage.getItem(STORE_NGRAM); if (cachedNgram) NGRAM_LOCAL = JSON.parse(cachedNgram); } catch {}
+  try {
+    const cachedCfg = localStorage.getItem(STORE_CFG);
+    if (cachedCfg) { CFG = JSON.parse(cachedCfg); indexarCards(); desenhar(); }
+  } catch {}
+  try {
+    CFG = await api("/api/config", null, 3000);
+    indexarCards();
+    try { localStorage.setItem(STORE_CFG, JSON.stringify(CFG)); } catch {}
+  } catch {
+    if (!CFG) {
+      $("#sentence").innerHTML = '<span class="hint">Sem conexão inicial. Conecte-se ao servidor uma vez para salvar a prancha offline.</span>';
+      return;
+    }
+  }
+  api("/api/ngram", null, 3000).then(ng => {
+    NGRAM_LOCAL = ng;
+    try { localStorage.setItem(STORE_NGRAM, JSON.stringify(ng)); } catch {}
+  }).catch(() => {});
+  desenhar();
+  await atualizarSugestoes();
+})();
 </script>
 </body>
 </html>

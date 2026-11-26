@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Aponta e Fala — Documentação de Engenharia</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 9.5mm 12mm 10.5mm 12mm;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    color: #1f2937;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+    font-size: 8.55pt;
+    line-height: 1.32;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    page-break-after: always;
+    position: relative;
+  }
+  .page:last-child {
+    page-break-after: auto;
+  }
+
+  /* Cabeçalho principal */
+  h1.doc-title {
+    margin: 0 0 2px 0;
+    font-size: 14.8pt;
+    line-height: 1.18;
+    color: #0b4fa3;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+  }
+  .doc-sub {
+    margin: 0 0 7px 0;
+    font-size: 7.9pt;
+    color: #5b6472;
+  }
+
+  /* Faixa de seção */
+  h2.sec {
+    margin: 7px 0 5px 0;
+    padding: 4px 9px;
+    background: #0b53a6;
+    color: #ffffff;
+    font-size: 10pt;
+    font-weight: 700;
+    border-radius: 2px;
+  }
+  h3.sub {
+    margin: 6px 0 3px 0;
+    font-size: 9pt;
+    font-weight: 700;
+    color: #0b53a6;
+  }
+
+  p {
+    margin: 0 0 4px 0;
+    text-align: justify;
+  }
+
+  ol, ul {
+    margin: 2px 0 5px 0;
+    padding-left: 17px;
+  }
+  li {
+    margin-bottom: 2.5px;
+    text-align: justify;
+  }
+
+  code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 7.8pt;
+    background: #f1f5f9;
+    padding: 0.3px 3px;
+    border-radius: 3px;
+    color: #0f172a;
+  }
+
+  a {
+    color: #0b53a6;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* Tabelas */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 3px 0 6px 0;
+    font-size: 8.15pt;
+    line-height: 1.3;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 3.6px 6.5px;
+    vertical-align: top;
+    text-align: left;
+  }
+  thead th {
+    background: #eaf1fb;
+    color: #0b4a96;
+    font-weight: 700;
+  }
+  td.key {
+    width: 20%;
+    background: #f3f7fc;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  td.col-sm {
+    width: 19%;
+    font-weight: 700;
+    background: #f8fafc;
+    color: #1e293b;
+  }
+  td.col-item {
+    width: 31%;
+    font-weight: 600;
+    background: #f8fafc;
+    color: #0f172a;
+  }
+  tr { break-inside: avoid; }
+
+  /* Diagrama */
+  .diagram-wrap {
+    margin: 6px 0 6px 0;
+    text-align: center;
+  }
+  .diagram-wrap svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .fig-caption {
+    font-size: 8.2pt;
+    color: #475569;
+    margin: 4px 0 7px 0;
+    text-align: justify;
+    line-height: 1.36;
+  }
+  .flows-box {
+    background: #f8fafc;
+    border-left: 3.5px solid #0b53a6;
+    padding: 7px 10px;
+    border-radius: 0 4px 4px 0;
+    font-size: 8.7pt;
+    line-height: 1.42;
+    text-align: justify;
+  }
+
+  /* Página 3 um pouco mais folgada */
+  .page3 {
+    font-size: 8.75pt;
+    line-height: 1.38;
+  }
+  .page3 table {
+    font-size: 8.4pt;
+    line-height: 1.34;
+    margin: 4px 0 8px 0;
+  }
+  .page3 th, .page3 td {
+    padding: 4.5px 7px;
+  }
+  .page3 li {
+    margin-bottom: 4px;
+  }
+  .page3 h3.sub {
+    margin: 9px 0 4px 0;
+    font-size: 9.4pt;
+  }
+
+  /* Rodapé */
+  .footer {
+    margin-top: 12px;
+    padding-top: 6px;
+    border-top: 1px solid #cbd5e1;
+    font-size: 7.7pt;
+    color: #64748b;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== PÁGINA 1 ==================== -->
+<div class="page">
+  <h1 class="doc-title">Aponta e Fala: comunicação alternativa por pictogramas e câmera, com frases geradas por um SLM destilado</h1>
+  <div class="doc-sub">
+    Documento de entrega · 5º Workshop de Trabalhos de IA, FASOFT/UniRV · Disciplinas: Redes Neurais Artificiais (RNA) e Tópicos em Engenharia de Software II (SLM) · Prof. Sandro Silva Moreira · 26/11/2026
+  </div>
+
+  <h2 class="sec">1. Identificação do Projeto</h2>
+  <table>
+    <tbody>
+      <tr>
+        <td class="key">Título do projeto</td>
+        <td>Aponta e Fala: comunicação alternativa por pictogramas e câmera, com frases geradas por um SLM destilado</td>
+      </tr>
+      <tr>
+        <td class="key">Trilha tecnológica</td>
+        <td><strong>Híbrida: SLMs + Redes Neurais.</strong> SLM (<code>Qwen3-0.6B</code> destilado, ajustado com QLoRA e quantizado), visão computacional (<code>YOLOv8n</code>) e rede recorrente (<code>LSTM</code>) para prever o próximo card.</td>
+      </tr>
+      <tr>
+        <td class="key">Integrantes e papéis</td>
+        <td>
+          <strong>Henrique Thomaz Landim Ruffato:</strong> arquitetura e API (FastAPI), roteador de frases (regras, compositor, guarda), destilação e treino do SLM, ajuste do YOLO, LSTM, empacotamento em Docker e acesso pelo tablet.<br>
+          <strong>Luiz Eduardo Santos Silva:</strong> correções críticas no fluxo de interface, fala e limpeza da prancha, refinamento das regras gramaticais de ajuda e ordenação, implementação da resiliência offline e tolerância a quedas de internet (Service Worker, motor local de frases em JS, circuit breaker no SLM e contingência local/USB), testes no tablet, gestão do repositório GitHub e consolidação da documentação de engenharia.
+        </td>
+      </tr>
+      <tr>
+        <td class="key">Repositório</td>
+        <td><a href="https://github.com/Luiz2608/falapicto-Sandro">https://github.com/Luiz2608/falapicto-Sandro</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="sec">2. Descritivo Técnico da Solução</h2>
+
+  <h3 class="sub">2.1 Problema e público-alvo</h3>
+  <p>
+    Crianças não verbais ou com dificuldade de fala, como alunos com autismo ou deficiência neurológica, utilizam comunicação aumentativa e alternativa (CAA). As pranchas de cards existentes apenas encadeiam palavras isoladas: <em>"mamãe, dor, cabeça"</em> vira uma lista solta, e tocar fora de ordem piora o entendimento. Em sala de aula, o objeto desejado muitas vezes está na mão da criança, mas não na prancha; além disso, redes Wi-Fi escolares e de eventos são instáveis e não podem interromper a comunicação. O usuário final é o aluno que utiliza o tablet para se comunicar com a professora ou responsável (com painel <code>/admin</code> protegido por PIN para educadores/fonoaudiólogas gerenciarem cards). Na demonstração interativa, o visitante assume o papel da criança: toca nos cards ou aponta a câmera para objetos.
+  </p>
+
+  <h3 class="sub">2.2 Funcionamento e fluxo de uso</h3>
+  <ol>
+    <li><strong>Entrada:</strong> no tablet (PWA em tela cheia), a criança toca em cards de pictogramas (43 cards em 6 categorias: pessoas, sentimentos, ações/verbos, objetos, social e respostas; 7 rotinas + 4 sempre visíveis) ou ativa a câmera.</li>
+    <li><strong>Sugestão:</strong> a cada toque, a tela atualiza imediatamente (0 ms) e consulta <code>/api/next</code>. A LSTM lê a rotina e o histórico de cards para destacar os próximos mais prováveis sem alterar a posição fixa da grade 3×3 (planejamento motor). Sem conexão, o navegador usa a tabela N-grama em cache local.</li>
+    <li><strong>Câmera:</strong> os quadros vão em memória para <code>/api/detect</code>. O <code>YOLOv8n</code> (COCO) e o <code>YOLOv8n</code> ajustado para material escolar detectam objetos e devolvem sobreposições no vídeo com nome e ícone.</li>
+    <li><strong>Falar:</strong> somente ao tocar em "Falar", <code>/api/speak</code> corrige a ordem dos cards, aplica memória de contexto da última frase, regras e compositor gramatical; combinações ambíguas ou sem cobertura vão ao SLM (protegido por guarda anti-invenção e <em>circuit breaker</em>).</li>
+    <li><strong>Saída e resiliência offline:</strong> a frase aparece na tela e é falada localmente via <strong>Web Speech API (<code>pt-BR</code>)</strong>. Se o SLM falhar ou for reprovado pelo guarda, um fallback determinístico responde; se a internet cair, o Service Worker e o motor offline em JS mantêm prancha, ordenação e voz funcionando sem interrupção.</li>
+  </ol>
+
+  <h3 class="sub">2.3 Stack tecnológica e modelos</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:19%;">Camada</th>
+        <th>Tecnologias, modelos e dados</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-sm">Interface, PWA e Voz</td>
+        <td>HTML5/CSS3/JS puro, PWA (<code>manifest.webmanifest</code>), Canvas API (overlay da câmera), Service Worker (<code>/sw.js</code>) + <code>localStorage</code> + motor offline (<code>offline-core.js</code>), Web Speech API (<code>speechSynthesis</code> <code>pt-BR</code> local) e painel <code>/admin</code> com PIN.</td>
+      </tr>
+      <tr>
+        <td class="col-sm">Backend e Infra</td>
+        <td>Python 3.11, FastAPI/Uvicorn, PyTorch (CPU) e torchvision, Ultralytics (YOLOv8), OpenCV, Unsloth e TRL (QLoRA), <code>llama.cpp</code> (servidor GGUF com <em>circuit breaker</em>), Docker, Caddy (HTTPS), <code>cloudflared</code>, modo local/USB (<code>rodar_offline.ps1</code>) e Google Colab (GPU T4).</td>
+      </tr>
+      <tr>
+        <td class="col-sm">SLM</td>
+        <td><code>Qwen3-0.6B</code>, ajustado com QLoRA (<code>r=16</code>, 6 épocas) e exportado em GGUF <code>f16</code> (1.198 MB), <code>q8_0</code> (639 MB) e <code>q4_k_m</code>; em produção utiliza o <strong><code>q4_k_m</code> (397 MB)</strong> em CPU.</td>
+      </tr>
+      <tr>
+        <td class="col-sm">Visão</td>
+        <td><code>YOLOv8n</code> pré-treinado no COCO (12 classes mapeadas para cards) + <code>YOLOv8n</code> ajustado (<em>transfer learning</em>) para 7 classes escolares: lápis, caneta, apontador, borracha, caderno, régua e tesoura.</td>
+      </tr>
+      <tr>
+        <td class="col-sm">Próximo card</td>
+        <td><code>LSTM</code> (29.677 parâmetros, PyTorch CPU), comparada com <code>N-grama</code> (bigrama, também salvo no cache offline), <code>MLP</code> e <code>RNN</code>.</td>
+      </tr>
+      <tr>
+        <td class="col-sm">Dados</td>
+        <td>
+          <strong>SLM:</strong> destilação em nível de sequência; Gemini (professor) gerou frases e, após curadoria, restaram 234 exemplos (<code>slm_train_curto.jsonl</code>).
+          <strong>YOLO:</strong> datasets abertos do Roboflow Universe (CC BY 4.0) mesclados (2.538 imagens usadas no treino e 149 na validação; pacote completo: 2.595 treino / 154 val / 125 teste).
+          <strong>LSTM:</strong> 20.000 sequências sintéticas (<code>seqs_v2.jsonl</code>). <strong>Vocabulário:</strong> 43 cards em 6 categorias.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== PÁGINA 2 ==================== -->
+<div class="page">
+  <h2 class="sec" style="margin-top:0;">3. Diagrama de Arquitetura do Sistema</h2>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 820 806" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+      <defs>
+        <marker id="arrowBlue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#1d5fa8"/>
+        </marker>
+        <marker id="arrowAmber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M 0 1 L 10 5 L 0 9 z" fill="#b45309"/>
+        </marker>
+      </defs>
+
+      <!-- ===== FUNDOS DAS CAMADAS ===== -->
+      <rect x="8" y="8" width="804" height="122" rx="10" fill="#f4f8fd" stroke="#93b7e0" stroke-width="1.4"/>
+      <rect x="8" y="160" width="804" height="180" rx="10" fill="#f4f8fd" stroke="#93b7e0" stroke-width="1.4"/>
+      <rect x="8" y="370" width="804" height="148" rx="10" fill="#f4f8fd" stroke="#93b7e0" stroke-width="1.4"/>
+      <rect x="8" y="548" width="804" height="92" rx="10" fill="#f4f8fd" stroke="#93b7e0" stroke-width="1.4"/>
+      <rect x="8" y="668" width="804" height="126" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="6,4"/>
+
+      <!-- ===== SETAS (desenhadas ANTES dos títulos/caixas para nunca cruzar texto) ===== -->
+      <!-- Camada 1 -> Camada 2 -->
+      <line x1="114" y1="116" x2="114" y2="190" stroke="#1d5fa8" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+      <path d="M 162 116 L 162 146 L 645 146 L 645 190" fill="none" stroke="#1d5fa8" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+      <line x1="340" y1="116" x2="340" y2="190" stroke="#1d5fa8" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+      <path d="M 480 116 L 480 138 L 210 138 L 210 190" fill="none" stroke="#1d5fa8" stroke-width="1.6" marker-end="url(#arrowBlue)"/>
+
+      <!-- Camada Offline -> Saída (bypass quando sem internet) -->
+      <path d="M 796 77 L 807 77 L 807 536 L 154 536 L 154 578" fill="none" stroke="#b45309" stroke-width="1.6" stroke-dasharray="5,3" marker-end="url(#arrowAmber)"/>
+
+      <!-- Camada 2 -> Camada 3 -->
+      <line x1="116" y1="326" x2="116" y2="400" stroke="#1d5fa8" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+      <path d="M 380 326 L 380 354 L 314 354 L 314 400" fill="none" stroke="#1d5fa8" stroke-width="1.7" marker-end="url(#arrowBlue)"/>
+      <path d="M 456 326 L 456 354 L 511 354 L 511 400" fill="none" stroke="#1d5fa8" stroke-width="1.7" marker-end="url(#arrowBlue)"/>
+      <line x1="696" y1="326" x2="696" y2="400" stroke="#1d5fa8" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+
+      <!-- Camada 3 -> Camada 4 -->
+      <line x1="109" y1="506" x2="109" y2="578" stroke="#1d5fa8" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+      <line x1="197" y1="604" x2="214" y2="604" stroke="#1d5fa8" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+      <path d="M 314 506 L 314 528 L 495 528 L 495 578" fill="none" stroke="#1d5fa8" stroke-width="1.6" marker-end="url(#arrowBlue)"/>
+      <path d="M 511 506 L 511 528 L 535 528 L 535 578" fill="none" stroke="#1d5fa8" stroke-width="1.6" marker-end="url(#arrowBlue)"/>
+      <line x1="707" y1="506" x2="707" y2="578" stroke="#1d5fa8" stroke-width="1.8" marker-end="url(#arrowBlue)"/>
+
+      <!-- ===== TÍTULOS DAS CAMADAS (com pill limpo sobre as setas) ===== -->
+      <rect x="18" y="14" width="388" height="19" rx="4" fill="#e5effb"/>
+      <text x="25" y="27.5" font-size="10.2" font-weight="800" fill="#0b53a6">CAMADA DE INTERFACE / ENTRADA (tablet · PWA no navegador)</text>
+
+      <rect x="18" y="166" width="466" height="19" rx="4" fill="#e5effb"/>
+      <text x="25" y="179.5" font-size="10.2" font-weight="800" fill="#0b53a6">CAMADA DE ORQUESTRAÇÃO E PROCESSAMENTO (API FastAPI · Docker)</text>
+
+      <rect x="18" y="376" width="366" height="19" rx="4" fill="#e5effb"/>
+      <text x="25" y="389.5" font-size="10.2" font-weight="800" fill="#0b53a6">CAMADA DE INFERÊNCIA / MODELOS (execução local em CPU)</text>
+
+      <rect x="18" y="554" width="318" height="19" rx="4" fill="#e5effb"/>
+      <text x="25" y="567.5" font-size="10.2" font-weight="800" fill="#0b53a6">CAMADA DE SAÍDA / AÇÃO (interface do tablet)</text>
+
+      <text x="22" y="687" font-size="10.2" font-weight="800" fill="#334155">TREINAMENTO (offline, Colab T4) E IMPLANTAÇÃO / CONTINGÊNCIA</text>
+      <text x="796" y="687" text-anchor="end" font-size="8.8" font-style="italic" fill="#64748b">os artefatos treinados alimentam a camada de inferência</text>
+
+      <!-- ===== CAMADA 1 BOXES ===== -->
+      <rect x="22" y="38" width="184" height="78" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="114" y="57" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">Prancha de cards</text>
+      <text x="114" y="73" text-anchor="middle" font-size="9.2" fill="#334155">43 pictogramas · 6 categorias</text>
+      <text x="114" y="87" text-anchor="middle" font-size="9.2" fill="#334155">7 rotinas (grade fixa 3×3)</text>
+      <text x="114" y="101" text-anchor="middle" font-size="9.2" fill="#334155">toque otimista (0 ms) + /admin</text>
+
+      <rect x="220" y="38" width="184" height="78" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="312" y="57" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">Câmera do tablet</text>
+      <text x="312" y="73" text-anchor="middle" font-size="9.2" fill="#334155">quadros de vídeo (JPEG)</text>
+      <text x="312" y="87" text-anchor="middle" font-size="9.2" fill="#334155">modo objetos + Canvas</text>
+      <text x="312" y="101" text-anchor="middle" font-size="9.2" fill="#334155">timeout 3,5 s + backoff</text>
+
+      <rect x="418" y="38" width="176" height="78" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="506" y="57" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">Botão "Falar"</text>
+      <text x="506" y="73" text-anchor="middle" font-size="9.2" fill="#334155">aciona montagem da frase</text>
+      <text x="506" y="87" text-anchor="middle" font-size="9.2" fill="#334155">e voz (nunca fala ao tocar</text>
+      <text x="506" y="101" text-anchor="middle" font-size="9.2" fill="#334155">cards individuais)</text>
+
+      <rect x="608" y="38" width="188" height="78" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.6" stroke-dasharray="5,3"/>
+      <text x="702" y="56" text-anchor="middle" font-size="10.5" font-weight="700" fill="#92400e">Camada Offline (PWA)</text>
+      <text x="702" y="71" text-anchor="middle" font-size="9" fill="#78350f">Service Worker (/sw.js) + cache</text>
+      <text x="702" y="85" text-anchor="middle" font-size="9" fill="#78350f">offline-core.js + N-grama local</text>
+      <text x="702" y="99" text-anchor="middle" font-size="9" fill="#78350f">regras + voz se rede cair</text>
+
+      <!-- ===== CAMADA 2 BOXES ===== -->
+      <rect x="22" y="192" width="256" height="134" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="150" y="210" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">/api/speak (roteador de frase)</text>
+      <text x="150" y="226" text-anchor="middle" font-size="9.1" fill="#334155">1. ordenar cards (líder na frente)</text>
+      <text x="150" y="240" text-anchor="middle" font-size="9.1" fill="#334155">2. memória de contexto da sessão</text>
+      <text x="150" y="254" text-anchor="middle" font-size="9.1" fill="#334155">3. regras e compositor gramatical (&lt;2 ms)</text>
+      <text x="150" y="268" text-anchor="middle" font-size="9.1" fill="#334155">4. sem cobertura → SLM (+ circuit breaker)</text>
+      <text x="150" y="282" text-anchor="middle" font-size="9.1" fill="#334155">5. guarda anti-invenção / fidelidade</text>
+      <text x="150" y="296" text-anchor="middle" font-size="9.1" fill="#334155">6. fallback determinístico (lista/frase)</text>
+      <text x="150" y="313" text-anchor="middle" font-size="8.6" font-weight="700" fill="#0b53a6">POST /api/speak · contexto + ordem</text>
+
+      <rect x="292" y="192" width="252" height="134" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="418" y="210" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">/api/detect (visão de objetos)</text>
+      <text x="418" y="230" text-anchor="middle" font-size="9.2" fill="#334155">processa imagem em memória (LGPD)</text>
+      <text x="418" y="246" text-anchor="middle" font-size="9.2" fill="#334155">junta detecções COCO + modelo ajustado</text>
+      <text x="418" y="262" text-anchor="middle" font-size="9.2" fill="#334155">classes escolares sem card suprimem</text>
+      <text x="418" y="276" text-anchor="middle" font-size="9.2" fill="#334155">falsos "copo" do COCO (IoU &gt; 0,5)</text>
+      <text x="418" y="292" text-anchor="middle" font-size="9.2" fill="#334155">confiança ≥ 0,35 → card + caixa [0..1]</text>
+      <text x="418" y="313" text-anchor="middle" font-size="8.6" font-weight="700" fill="#0b53a6">POST /api/detect · sem gravação em disco</text>
+
+      <rect x="558" y="192" width="238" height="134" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="677" y="210" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">/api/next (próximo card)</text>
+      <text x="677" y="232" text-anchor="middle" font-size="9.2" fill="#334155">recebe rotina + histórico da sessão</text>
+      <text x="677" y="248" text-anchor="middle" font-size="9.2" fill="#334155">→ sequência de entrada p/ LSTM</text>
+      <text x="677" y="264" text-anchor="middle" font-size="9.2" fill="#334155">→ probabilidades top-k (k = 4)</text>
+      <text x="677" y="280" text-anchor="middle" font-size="9.2" fill="#334155">→ fallback N-grama se PyTorch ausente</text>
+      <text x="677" y="298" text-anchor="middle" font-size="8.8" fill="#475569">também serve /api/config, /api/ngram,</text>
+      <text x="677" y="312" text-anchor="middle" font-size="8.8" fill="#475569">/api/health e /sw.js</text>
+
+      <!-- ===== CAMADA 3 BOXES ===== -->
+      <rect x="22" y="402" width="188" height="104" rx="8" fill="#ffffff" stroke="#0f4c9a" stroke-width="1.6"/>
+      <text x="116" y="421" text-anchor="middle" font-size="10.8" font-weight="700" fill="#0f172a">SLM Qwen3-0.6B</text>
+      <text x="116" y="437" text-anchor="middle" font-size="9.1" fill="#334155">QLoRA + GGUF Q4_K_M</text>
+      <text x="116" y="451" text-anchor="middle" font-size="9.1" fill="#334155">llama.cpp (container slm)</text>
+      <text x="116" y="465" text-anchor="middle" font-size="9.1" fill="#334155">397 MB · ≈ 0,89 s/frase</text>
+      <text x="116" y="479" text-anchor="middle" font-size="9.1" fill="#334155">temperatura 0 · modo curto</text>
+      <text x="116" y="495" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0b53a6">exato 70,8% · fiel 87,5%</text>
+
+      <rect x="222" y="402" width="184" height="104" rx="8" fill="#ffffff" stroke="#0f4c9a" stroke-width="1.6"/>
+      <text x="314" y="421" text-anchor="middle" font-size="10.8" font-weight="700" fill="#0f172a">YOLOv8n — COCO</text>
+      <text x="314" y="439" text-anchor="middle" font-size="9.1" fill="#334155">objetos do dia a dia:</text>
+      <text x="314" y="453" text-anchor="middle" font-size="9.1" fill="#334155">copo, garrafa, livro, bola,</text>
+      <text x="314" y="467" text-anchor="middle" font-size="9.1" fill="#334155">mochila, maçã, banana...</text>
+      <text x="314" y="489" text-anchor="middle" font-size="8.8" font-weight="700" fill="#0b53a6">12 classes → cards</text>
+
+      <rect x="418" y="402" width="186" height="104" rx="8" fill="#ffffff" stroke="#0f4c9a" stroke-width="1.6"/>
+      <text x="511" y="421" text-anchor="middle" font-size="10.8" font-weight="700" fill="#0f172a">YOLOv8n ajustado</text>
+      <text x="511" y="439" text-anchor="middle" font-size="9.1" fill="#334155">material escolar (7 classes):</text>
+      <text x="511" y="453" text-anchor="middle" font-size="9.1" fill="#334155">lápis, caneta, apontador,</text>
+      <text x="511" y="467" text-anchor="middle" font-size="9.1" fill="#334155">borracha, caderno, régua, tesoura</text>
+      <text x="511" y="489" text-anchor="middle" font-size="8.8" font-weight="700" fill="#0b53a6">mAP50 = 0,749</text>
+
+      <rect x="616" y="402" width="180" height="104" rx="8" fill="#ffffff" stroke="#0f4c9a" stroke-width="1.6"/>
+      <text x="706" y="421" text-anchor="middle" font-size="10.8" font-weight="700" fill="#0f172a">LSTM (+ N-grama)</text>
+      <text x="706" y="439" text-anchor="middle" font-size="9.1" fill="#334155">previsão de próximo card</text>
+      <text x="706" y="453" text-anchor="middle" font-size="9.1" fill="#334155">PyTorch CPU (29,7k params)</text>
+      <text x="706" y="467" text-anchor="middle" font-size="9.1" fill="#334155">0,15 ms/passo · Top-3 85,7%</text>
+      <text x="706" y="489" text-anchor="middle" font-size="8.8" font-weight="700" fill="#0b53a6">retorno à distância: 100%</text>
+
+      <!-- ===== CAMADA 4 BOXES ===== -->
+      <rect x="22" y="580" width="175" height="48" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="109" y="601" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0f172a">Frase na tela</text>
+      <text x="109" y="617" text-anchor="middle" font-size="8.8" fill="#475569">chips na ordem corrigida</text>
+
+      <rect x="216" y="580" width="194" height="48" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="313" y="601" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0f172a">Voz local (Web Speech)</text>
+      <text x="313" y="617" text-anchor="middle" font-size="8.8" fill="#475569">pt-BR ao tocar em "Falar"</text>
+
+      <rect x="429" y="580" width="176" height="48" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="517" y="601" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0f172a">Objeto: nome + ícone</text>
+      <text x="517" y="617" text-anchor="middle" font-size="8.8" fill="#475569">overlay na câmera + card</text>
+
+      <rect x="624" y="580" width="172" height="48" rx="8" fill="#ffffff" stroke="#1d5fa8" stroke-width="1.6"/>
+      <text x="710" y="601" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0f172a">Próximo card destacado</text>
+      <text x="710" y="617" text-anchor="middle" font-size="8.8" fill="#475569">pulso visual em posição fixa</text>
+
+      <!-- ===== FAIXA 5 BOXES ===== -->
+      <rect x="22" y="698" width="184" height="82" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+      <text x="114" y="717" text-anchor="middle" font-size="9.8" font-weight="700" fill="#1e293b">Gemini (professor)</text>
+      <text x="114" y="733" text-anchor="middle" font-size="8.8" fill="#475569">→ curadoria (234 ex.)</text>
+      <text x="114" y="747" text-anchor="middle" font-size="8.8" fill="#475569">→ QLoRA (r=16, 6 ép.)</text>
+      <text x="114" y="761" text-anchor="middle" font-size="8.8" fill="#475569">→ GGUF f16 / q8_0 / q4_k_m</text>
+
+      <rect x="218" y="698" width="184" height="82" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+      <text x="310" y="717" text-anchor="middle" font-size="9.8" font-weight="700" fill="#1e293b">Datasets Roboflow</text>
+      <text x="310" y="733" text-anchor="middle" font-size="8.8" fill="#475569">→ mesclagem de classes</text>
+      <text x="310" y="747" text-anchor="middle" font-size="8.8" fill="#475569">→ 2.538 treino / 149 val</text>
+      <text x="310" y="761" text-anchor="middle" font-size="8.8" fill="#475569">→ ajuste fino YOLOv8n</text>
+
+      <rect x="414" y="698" width="184" height="82" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+      <text x="506" y="717" text-anchor="middle" font-size="9.8" font-weight="700" fill="#1e293b">Sequências sintéticas</text>
+      <text x="506" y="733" text-anchor="middle" font-size="8.8" fill="#475569">→ 20k seqs (seqs_v2.jsonl)</text>
+      <text x="506" y="747" text-anchor="middle" font-size="8.8" fill="#475569">→ comparação N-grama /</text>
+      <text x="506" y="761" text-anchor="middle" font-size="8.8" fill="#475569">MLP / RNN / LSTM</text>
+
+      <rect x="610" y="698" width="186" height="82" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2"/>
+      <text x="703" y="717" text-anchor="middle" font-size="9.8" font-weight="700" fill="#1e293b">Deploy &amp; Contingência</text>
+      <text x="703" y="733" text-anchor="middle" font-size="8.8" fill="#475569">Docker (API + SLM + Caddy)</text>
+      <text x="703" y="747" text-anchor="middle" font-size="8.8" fill="#475569">→ túnel cloudflared (HTTPS)</text>
+      <text x="703" y="761" text-anchor="middle" font-size="8.8" fill="#475569">ou LAN / Hotspot / Cabo USB</text>
+    </svg>
+  </div>
+
+  <div class="fig-caption">
+    <strong>Figura 1.</strong> Arquitetura do <em>Aponta e Fala</em>. As setas azuis contínuas mostram o fluxo de dados em operação normal; a seta laranja tracejada ilustra a contingência offline no navegador (Service Worker + <code>offline-core.js</code> + N-grama local) em caso de queda da rede; a faixa inferior tracejada mostra a origem offline dos modelos treinados e as opções de implantação no tablet.
+  </div>
+
+  <div class="flows-box">
+    <strong>Fluxos principais:</strong> No fluxo de <strong>frase</strong>, os toques nos cards seguem para <code>/api/speak</code>: a ordem é corrigida (o card líder abre a frase), aplica-se a memória de contexto da última fala e as camadas de regras e compositor gramatical resolvem combinações válidas em &lt; 2 ms. Apenas o que não tem cobertura segue ao SLM <code>Qwen3-0.6B</code> (protegido por <em>circuit breaker</em>). O guarda reprova a frase se algum card foi omitido ou inventado, acionando o fallback determinístico. A voz local (Web Speech API <code>pt-BR</code>) só toca ao pressionar "Falar". No fluxo de <strong>câmera</strong>, os quadros vão em memória para <code>/api/detect</code>, que combina <code>YOLOv8n</code> (COCO) e o modelo ajustado, suprime falsos "copo" por IoU &gt; 0,5 e devolve caixas normalizadas com nome e ícone. No fluxo de <strong>sugestão</strong>, <code>/api/next</code> consulta a LSTM (ou N-grama como fallback) para destacar o próximo card em posição fixa. Em caso de <strong>queda de internet</strong>, o Service Worker e <code>offline-core.js</code> assumem prancha, ordenação, sugestões N-grama e voz localmente, reconectando automaticamente quando o servidor volta.
+  </div>
+</div>
+
+<!-- ==================== PÁGINA 3 ==================== -->
+<div class="page page3">
+  <h2 class="sec" style="margin-top:0;">4. Status Atual e Próximos Passos (Checklist de Maturidade)</h2>
+
+  <h3 class="sub">4.1 Implementado e validado</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:31%;">Item</th>
+        <th>Evidência técnica</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="col-item">Protótipo completo em Docker (API + SLM) acessível pelo tablet</td>
+        <td><code>/api/health</code> retorna <code>ok</code>, <code>yolo</code>, <code>yolo_extra</code>, <code>lstm</code>, <code>slm</code> e <code>slm_online</code>; acesso pelo tablet via túnel testado e painel <code>/admin</code> protegido por PIN.</td>
+      </tr>
+      <tr>
+        <td class="col-item">SLM destilado, quantizado e servido em CPU</td>
+        <td>Acerto exato de <strong>70,8%</strong> (24 exemplos de teste) em <code>f16</code>, <code>q8_0</code> e <code>q4_k_m</code>; produção em <code>q4_k_m</code> com <strong>397 MB</strong>, <strong>894 ms</strong> médios (p95 1.100 ms) e <strong>87,5%</strong> de fidelidade aos cards.</td>
+      </tr>
+      <tr>
+        <td class="col-item">Resposta direta (sem bloco de "pensamento")</td>
+        <td>No <code>q4_k_m</code>, a latência média caiu de <strong>2,54 s</strong> (p95 2,95 s) para <strong>0,89 s</strong> (p95 1,10 s) e o acerto exato subiu de <strong>54,2%</strong> para <strong>70,8%</strong>; o raciocínio explícito custava ~3× mais tokens sem ganhar acurácia.</td>
+      </tr>
+      <tr>
+        <td class="col-item">Roteador de frases, contexto e guarda anti-invenção</td>
+        <td>Compositor validado em ~34 mil combinações sem omitir ou inventar cards; regra/compositor respondem em &lt; 2 ms; correções críticas aplicadas no fluxo de fala, limpeza e regras de ajuda.</td>
+      </tr>
+      <tr>
+        <td class="col-item">Câmera com reconhecimento e sobreposição</td>
+        <td><code>YOLOv8n</code> ajustado com <strong>mAP50 = 0,749</strong> e <strong>mAP50-95 = 0,528</strong> em 149 imagens de validação; por classe: tesoura 0,99, caderno 0,79, régua 0,79, apontador 0,77, borracha 0,74, lápis 0,65, caneta 0,51.</td>
+      </tr>
+      <tr>
+        <td class="col-item">Previsão do próximo card</td>
+        <td><code>LSTM</code> atingiu <strong>Top-1 55,7%</strong>, <strong>Top-3 85,7%</strong> e <strong>0,15 ms/passo</strong>. No card de retorno com dependência à distância (n=419): <strong>LSTM e RNN 100%</strong>, MLP 52,9% e N-grama 34,8%.</td>
+      </tr>
+      <tr>
+        <td class="col-item">Resiliência offline e quedas de internet</td>
+        <td>Service Worker (<code>/sw.js</code>), cache em <code>localStorage</code>, motor determinístico local (<code>offline-core.js</code>), N-grama local, <em>circuit breaker</em> no SLM, timeout/backoff na câmera e script <code>rodar_offline.ps1</code> (LAN/Hotspot/cabo USB). Validado em testes automatizados da API e do motor JS.</td>
+      </tr>
+      <tr>
+        <td class="col-item">Voz só ao tocar em "Falar" e correção de ordem</td>
+        <td>Validado no tablet e em suíte de testes automatizados (ordenação de cards líder, vocativos, recipientes e memória de contexto).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub">4.2 Falta para a demonstração interativa</h3>
+  <ul>
+    <li><strong>Validação de campo da contingência offline:</strong> ensaiar no tablet oficial da apresentação o modo 100% local via cabo USB (<code>adb reverse</code>) e hotspot com SLM + YOLO simultâneos, sem depender de internet externa.</li>
+    <li><strong>Testes de borda no tablet:</strong> avaliar iluminação real do auditório/sala do workshop e comportamento com objetos fora das 7 classes do YOLO ajustado.</li>
+    <li><strong>Pictogramas definitivos:</strong> conferir a licença do conjunto ARASAAC para substituir os emojis provisórios e consolidar o vocabulário final.</li>
+    <li><strong>Preparação da demo:</strong> fechar roteiro interativo de 2 a 3 minutos e alterar o <code>ADMIN_PIN</code> padrão antes de abrir o acesso ao público.</li>
+  </ul>
+
+  <h3 class="sub">4.3 Gargalos e desafios técnicos</h3>
+  <ul>
+    <li><strong>Acesso externo e infraestrutura de rede no evento:</strong> o túnel gratuito da Cloudflare gera uma URL nova a cada reinício e depende da internet do local. Mitigamos o risco crítico com o modo offline (Service Worker + motor JS local) e a contingência por cabo USB/hotspot, mas ainda precisamos de orientação sobre a disponibilidade de rede local/Wi-Fi no dia da apresentação.</li>
+    <li><strong>Qualidade do SLM em combinações fora das regras:</strong> o conjunto de teste é pequeno (24 exemplos) e o acerto exato nas combinações sem regra foi de <strong>40%</strong> (5 exemplos). O guarda garante fidelidade aos cards, porém não detecta todos os desvios gramaticais, podendo deixar passar frases pouco naturais.</li>
+    <li><strong>Desequilíbrio no YOLO ajustado:</strong> <code>caneta</code> (0,51) e <code>lápis</code> (0,65) apresentam menor precisão; <code>tesoura</code> contou com apenas 4 amostras na validação, tornando o índice 0,99 estatisticamente frágil.</li>
+    <li><strong>Validação com o público final:</strong> o sistema ainda não foi testado com crianças reais; os conjuntos de treino do SLM e da LSTM são sintéticos e refletem a gramática definida pela equipe.</li>
+  </ul>
+
+  <div class="footer">
+    <span><strong>Aponta e Fala</strong> · Henrique Thomaz Landim Ruffato (henrique.ruffato@academico.unirv.edu.br) · Luiz Eduardo Santos Silva (luiz.e.s.silva@academico.unirv.edu.br)</span>
+    <span>github.com/Luiz2608/falapicto-Sandro</span>
+  </div>
+</div>
+
+</body>
+</html>
