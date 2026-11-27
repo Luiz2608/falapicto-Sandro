@@ -78,7 +78,7 @@ def _load_lstm():
     return _lstm["model"]
 
 
-def predict_next(rotina, seq, k=5):
+def predict_next(rotina, seq, k=4):
     lm = _load_lstm()
     if lm:
         m, card_ids, rot_ids, off, torch = lm
@@ -127,7 +127,7 @@ def slm_sentence(seq):
 class NextIn(BaseModel):
     rotina: str
     seq: list[str] = []
-    k: int = 5
+    k: int = 4
 
 
 class SpeakIn(BaseModel):

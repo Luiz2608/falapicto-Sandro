@@ -1,8 +1,17 @@
 # Uso offline em rede local / hotspot (sem internet, sem domínio externo).
-# Gera certificado HTTPS local (tls internal) para liberar a câmera no tablet.
-# No tablet, ao abrir https://<IP-DO-NOTEBOOK>, aceite o aviso de certificado local.
+# Gera certificado HTTPS local (tls internal on_demand) para qualquer IP local e libera a câmera.
+# No tablet/iPhone, ao abrir https://<IP-DO-NOTEBOOK>, aceite o aviso de certificado local.
+{
+	auto_https disable_redirects
+	on_demand_tls {
+		ask http://api:8000/api/health
+	}
+}
+
 :443 {
-	tls internal
+	tls internal {
+		on_demand
+	}
 	encode gzip
 	reverse_proxy api:8000
 }

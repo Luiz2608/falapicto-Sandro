@@ -10,16 +10,16 @@ services:
     volumes:
       - dados:/app/data          # cards, uploads e backups persistem aqui
     ports:
-      - "127.0.0.1:8000:8000"
-  caddy:                          # https automático (Let's Encrypt)
+      - "8000:8000"
+  caddy:                          # https local sem internet (Caddyfile.local)
     image: caddy:2
     restart: unless-stopped
     depends_on: [api]
-    ports: ["80:80", "443:443"]
+    ports: ["443:443"]
     environment:
       DOMINIO: ${DOMINIO:-localhost}
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./Caddyfile.local:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
   slm:                            # opcional: perfil "slm" (coloque o .gguf em ./models/)
     profiles: ["slm"]
@@ -27,6 +27,11 @@ services:
     restart: unless-stopped
     command: ["-m", "/models/${SLM_ARQUIVO:-Qwen3-0.6B-curto.Q4_K_M.gguf}", "--host", "0.0.0.0", "--port", "8080", "-c", "512"]
     volumes: ["./models:/models:ro"]
+  tunnel:                         # opcional: perfil "tunnel" (HTTPS rápido via Cloudflare, sem instalar nada)
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:latest
+    depends_on: [api]
+    command: ["tunnel", "--no-autoupdate", "--url", "http://api:8000"]
 volumes:
   dados:
   caddy_data:

@@ -213,7 +213,7 @@
         <td class="key">Integrantes e papéis</td>
         <td>
           <strong>Henrique Thomaz Landim Ruffato:</strong> arquitetura e API (FastAPI), roteador de frases (regras, compositor, guarda), destilação e treino do SLM, ajuste do YOLO, LSTM, empacotamento em Docker e acesso pelo tablet.<br>
-          <strong>Luiz Eduardo Santos Silva:</strong> correções críticas no fluxo de interface, fala e limpeza da prancha, refinamento das regras gramaticais de ajuda e ordenação, implementação da resiliência offline e tolerância a quedas de internet (Service Worker, motor local de frases em JS, circuit breaker no SLM e contingência local/USB), testes no tablet, gestão do repositório GitHub e consolidação da documentação de engenharia.
+          <strong>Luiz Eduardo Santos Silva:</strong> correções no fluxo de fala e limpeza (voz apenas no botão "Falar" e cancelamento imediato ao limpar), refinamento das regras de <code>ajuda</code> e ordenação, implementação da resiliência offline (Service Worker, motor local em JS, circuit breaker no SLM e contingência local/USB), testes automatizados e no tablet, gestão do GitHub e documentação de engenharia.
         </td>
       </tr>
       <tr>
@@ -497,7 +497,7 @@
       </tr>
       <tr>
         <td class="col-item">SLM destilado, quantizado e servido em CPU</td>
-        <td>Acerto exato de <strong>70,8%</strong> (24 exemplos de teste) em <code>f16</code>, <code>q8_0</code> e <code>q4_k_m</code>; produção em <code>q4_k_m</code> com <strong>397 MB</strong>, <strong>894 ms</strong> médios (p95 1.100 ms) e <strong>87,5%</strong> de fidelidade aos cards.</td>
+        <td>Acerto exato de <strong>70,8%</strong> (24 exemplos de teste) em <code>f16</code>, <code>q8_0</code> e <code>q4_k_m</code>; fidelidade aos cards de <strong>87,5%</strong> no <code>q4_k_m</code> (vs. <strong>83,3%</strong> em <code>f16</code> e <code>q8_0</code>); produção em <code>q4_k_m</code> com <strong>397 MB</strong> e <strong>894 ms</strong> médios (p95 1.100 ms).</td>
       </tr>
       <tr>
         <td class="col-item">Resposta direta (sem bloco de "pensamento")</td>
@@ -505,11 +505,11 @@
       </tr>
       <tr>
         <td class="col-item">Roteador de frases, contexto e guarda anti-invenção</td>
-        <td>Compositor validado em ~34 mil combinações sem omitir ou inventar cards; regra/compositor respondem em &lt; 2 ms; correções críticas aplicadas no fluxo de fala, limpeza e regras de ajuda.</td>
+        <td>Compositor validado em ~34 mil combinações sem omitir ou inventar cards; regra/compositor respondem em &lt; 2 ms; corrigido fluxo de voz (só no botão "Falar", com <code>cancel()</code> em "Limpar") e prioridade de <code>eu_quero</code>/<code>nao_quero</code> + <code>ajuda</code>.</td>
       </tr>
       <tr>
         <td class="col-item">Câmera com reconhecimento e sobreposição</td>
-        <td><code>YOLOv8n</code> ajustado com <strong>mAP50 = 0,749</strong> e <strong>mAP50-95 = 0,528</strong> em 149 imagens de validação; por classe: tesoura 0,99, caderno 0,79, régua 0,79, apontador 0,77, borracha 0,74, lápis 0,65, caneta 0,51.</td>
+        <td><code>YOLOv8n</code> ajustado com <strong>mAP50 = 0,749</strong> e <strong>mAP50-95 = 0,528</strong> em 149 imagens de validação (<code>docs/resultados_yolo.md</code>); por classe: tesoura 0,99, caderno 0,79, régua 0,79, apontador 0,77, borracha 0,74, lápis 0,65, caneta 0,51.</td>
       </tr>
       <tr>
         <td class="col-item">Previsão do próximo card</td>
@@ -517,11 +517,11 @@
       </tr>
       <tr>
         <td class="col-item">Resiliência offline e quedas de internet</td>
-        <td>Service Worker (<code>/sw.js</code>), cache em <code>localStorage</code>, motor determinístico local (<code>offline-core.js</code>), N-grama local, <em>circuit breaker</em> no SLM, timeout/backoff na câmera e script <code>rodar_offline.ps1</code> (LAN/Hotspot/cabo USB). Validado em testes automatizados da API e do motor JS.</td>
+        <td>Service Worker (<code>/sw.js</code>), cache em <code>localStorage</code>, motor determinístico local (<code>offline-core.js</code>), N-grama local, <em>circuit breaker</em> no SLM, timeout/backoff na câmera e script <code>rodar_offline.ps1</code> (LAN/Hotspot/cabo USB). Validado na suíte de testes automatizados (<code>tests/</code>).</td>
       </tr>
       <tr>
         <td class="col-item">Voz só ao tocar em "Falar" e correção de ordem</td>
-        <td>Validado no tablet e em suíte de testes automatizados (ordenação de cards líder, vocativos, recipientes e memória de contexto).</td>
+        <td>Validado no tablet/iOS e em testes automatizados (<code>tests/test_api_e_regras.py</code> e <code>tests/test_offline_core.js</code>): ordenação de cards líder, vocativos, recipientes, regras de ajuda e memória de contexto.</td>
       </tr>
     </tbody>
   </table>

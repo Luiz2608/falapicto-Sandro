@@ -6,7 +6,7 @@ A criança toca em cards de pictogramas ou aponta a câmera do tablet para um ob
 - **Disciplinas:** Redes Neurais Artificiais (RNA) e Tópicos em Engenharia de Software II (SLM) — FASOFT/UniRV (Prof. Sandro Silva Moreira)
 - **Equipe:**
   - **Henrique Thomaz Landim Ruffato:** arquitetura e API (FastAPI), roteador de frases (regras, compositor, guarda), destilação e treino do SLM, ajuste do YOLO, LSTM, empacotamento em Docker e acesso pelo tablet.
-  - **Luiz Eduardo Santos Silva:** correções críticas no fluxo de interface, fala e limpeza da prancha, refinamento das regras gramaticais de ajuda/ordenação, implementação da resiliência offline e tolerância a quedas de rede (Service Worker, motor local de frases, circuit breaker e contingência local), testes no tablet, gestão do repositório e consolidação da documentação de engenharia.
+  - **Luiz Eduardo Santos Silva:** correções no fluxo de fala e limpeza (voz apenas no botão "Falar" e interrupção imediata ao limpar), refinamento das regras de `ajuda` e ordenação (`eu_quero`/`nao_quero` + `ajuda`), implementação da resiliência offline (Service Worker, motor local de frases em JS, circuit breaker e contingência local), suíte de testes automatizados (`tests/`), testes no tablet/iOS, gestão do repositório e documentação de engenharia.
 
 ---
 
@@ -72,10 +72,16 @@ API FastAPI (container Docker, CPU)
 ---
 
 ## Principais resultados validados
-- **SLM (`Qwen3-0.6B`, QLoRA `r=16`, 6 épocas, 234 exemplos curados do Gemini):** acerto exato de **70,8%** (24 exemplos de teste) em `f16`, `q8_0` e `q4_k_m`; produção em **`q4_k_m` (397 MB)** com latência média de **894 ms** (redução de 2,54 s no modo com pensamento para 0,89 s sem pensamento) e **87,5%** de fidelidade aos cards ([docs/resultados_slm_curto.md](docs/resultados_slm_curto.md)).
+- **SLM (`Qwen3-0.6B`, QLoRA `r=16`, 6 épocas, 234 exemplos curados do Gemini):** acerto exato de **70,8%** (24 exemplos de teste) em `f16`, `q8_0` e `q4_k_m`; fidelidade aos cards de **87,5%** no `q4_k_m` (vs. **83,3%** em `f16` e `q8_0`); produção em **`q4_k_m` (397 MB)** com latência média de **894 ms** (redução de 2,54 s no modo com pensamento para 0,89 s sem pensamento) ([docs/resultados_slm_curto.md](docs/resultados_slm_curto.md)).
 - **Roteador + Compositor + Guarda:** validado em ~34 mil combinações sem omitir ou inventar cards; respostas por regra/compositor em **< 2 ms**.
-- **Visão (`YOLOv8n` transfer learning, 7 classes escolares):** **mAP50 = 0,749** e **mAP50-95 = 0,528** na validação; mesclado em tempo real com 12 classes do COCO.
+- **Visão (`YOLOv8n` transfer learning, 7 classes escolares):** **mAP50 = 0,749** e **mAP50-95 = 0,528** na validação ([docs/resultados_yolo.md](docs/resultados_yolo.md)); mesclado em tempo real com 12 classes do COCO.
 - **Próximo card (`LSTM` vs. `RNN`, `MLP` e `N-grama`):** **Top-1 55,7%**, **Top-3 85,7%**, latência **0,15 ms/passo** e **100%** de acerto no card de retorno com dependência a distância (vs. 52,9% MLP e 34,8% N-grama) ([docs/resultados_seq_v2.md](docs/resultados_seq_v2.md)).
+
+## Testes automatizados
+```bash
+python -m unittest discover -s tests -v   # regras, compositor, guarda e endpoints FastAPI
+node tests/test_offline_core.js           # motor determinístico offline (web/offline-core.js)
+```
 
 ---
 

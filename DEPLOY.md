@@ -34,7 +34,7 @@ A câmera do tablet (`getUserMedia`) exige **HTTPS** ou **`localhost`**. Abaixo 
 ## B) Túnel temporário com internet (`cloudflared`, sem conta de nuvem)
 ```bash
 docker build -t aponta-e-fala .
-docker run -d --name aponta-e-fala -p 8000:8000 -e ADMIN_PIN=1234abcd -v aponta_dados:/app/data aponta-e-fala
+docker run -d --name aponta-e-fala -p 8000:8000 -e ADMIN_PIN=<SEU_PIN_SEGURO> -v aponta_dados:/app/data aponta-e-fala
 cloudflared tunnel --url http://localhost:8000
 ```
 Abra o link `https://xxxx.trycloudflare.com` no tablet (Chrome → menu ⋮ → **Adicionar à tela inicial**). O link muda a cada reinício — por isso, para a feira/workshop, mantenha a **Opção A** pronta como contingência.
