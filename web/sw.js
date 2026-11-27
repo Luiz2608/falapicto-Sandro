@@ -1,5 +1,5 @@
 // Service Worker do Aponta e Fala — garante abertura e uso da prancha mesmo sem internet.
-const CACHE_NAME = "aponta-e-fala-v1";
+const CACHE_NAME = "aponta-e-fala-v2";
 const PRECACHE = [
   "/",
   "/manifest.webmanifest",

@@ -1,0 +1,119 @@
+========================================================================
+  APONTA E FALA - INSTRUCOES PARA EXECUTAR NO NOTEBOOK (WINDOWS)
+========================================================================
+
+Este guia mostra como instalar e rodar o projeto em outro computador
+(como o seu notebook), com ou sem Docker, e como abrir no tablet.
+
+
+------------------------------------------------------------------------
+1. COPIANDO O PROJETO PARA O NOTEBOOK
+------------------------------------------------------------------------
+Opcao A (via GitHub - codigo, LSTM e YOLO ajustado):
+  git clone https://github.com/Luiz2608/falapicto-Sandro.git
+  cd falapicto-Sandro
+
+  * Se quiser rodar tambem o SLM (Qwen3-0.6B), copie o arquivo
+    "Qwen3-0.6B-curto.Q4_K_M.gguf" (378 MB) para dentro da pasta
+    "models\" do projeto.
+
+Opcao B (copiando o ZIP do Google Drive / pen drive):
+  Descompacte a pasta do projeto no notebook (ex.: C:\aponta-e-fala).
+  * NAO precisa copiar a pasta ".venv" de outro PC (ela e recriada
+    em 2 minutos no passo abaixo).
+
+
+------------------------------------------------------------------------
+2. MODO RAPIDO SEM DOCKER (Python direto - YOLO + LSTM + Regras + Voz)
+------------------------------------------------------------------------
+Pre-requisito: Python 3.11+ instalado (marque "Add Python to PATH").
+
+Na primeira vez no notebook, abra o PowerShell dentro da pasta do
+projeto e crie o ambiente virtual:
+
+  python -m venv .venv
+  .\.venv\Scripts\pip install -r requirements.txt
+  .\.venv\Scripts\pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+  .\.venv\Scripts\pip install ultralytics opencv-python-headless
+
+Depois, sempre que quiser ligar o servidor, basta rodar:
+
+  .\rodar_offline.ps1
+
+  (Se o PowerShell bloquear scripts .ps1, rode uma unica vez:
+   Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+   ou inicie direto com:
+   .\.venv\Scripts\python.exe -m uvicorn api.main:app --host 0.0.0.0 --port 8000)
+
+Abra no navegador do notebook:
+  - App principal:        http://localhost:8000
+  - Painel de cards:      http://localhost:8000/admin  (PIN padrao: 1234)
+  - Status dos modelos:   http://localhost:8000/api/health
+
+
+------------------------------------------------------------------------
+3. MODO COMPLETO COM DOCKER (API + YOLO + LSTM + SLM Qwen3-0.6B)
+------------------------------------------------------------------------
+Pre-requisito: Docker Desktop instalado (com WSL 2) e aberto (verde),
+e o arquivo "models\Qwen3-0.6B-curto.Q4_K_M.gguf" presente na pasta.
+
+Abra o PowerShell na pasta do projeto e rode:
+
+  $env:ADMIN_PIN="troque-esse-pin"
+  $env:SLM_URL="http://slm:8080/v1/chat/completions"
+  docker compose --profile slm up -d --build api slm
+
+* Na 1a vez demora alguns minutos (baixa Python, PyTorch, YOLO e
+  llama.cpp). Nas proximas vezes liga em poucos segundos.
+* Confira em http://localhost:8000/api/health se "yolo", "yolo_extra",
+  "lstm", "slm" e "slm_online" estao como true.
+* Para desligar depois:
+  docker compose --profile slm down
+
+
+------------------------------------------------------------------------
+4. COMO ABRIR NO TABLET / CELULAR
+------------------------------------------------------------------------
+Com o servidor rodando no notebook (porta 8000):
+
+A) MELHOR PARA DEMONSTRACAO SEM INTERNET (Cabo USB - Android):
+   Funciona 100% da IA (SLM + YOLO + LSTM + Camera + Voz) SEM INTERNET!
+   1. Ative "Depuracao USB" no tablet e conecte ao notebook por cabo.
+   2. No Chrome do notebook, abra:  chrome://inspect/#devices
+      Clique em "Port forwarding" -> adicione: 8000 -> localhost:8000
+      (ou rode no terminal: adb reverse tcp:8000 tcp:8000)
+   3. No Chrome do tablet, abra:  http://localhost:8000
+
+B) MESMO WI-FI OU HOTSPOT DO CELULAR (sem cabo):
+   1. Conecte o notebook e o tablet na mesma rede.
+   2. No tablet, abra:  http://<IP-DO-NOTEBOOK>:8000
+      (o IP aparece automaticamente ao rodar .\rodar_offline.ps1)
+   * Funciona prancha, voz, LSTM e SLM. Para liberar a camera nesse
+     modo sem internet, veja a secao Caddyfile.local no DEPLOY.md.
+
+C) COM INTERNET (Tunel HTTPS rapido via Cloudflare):
+   Em outro terminal, com o servidor rodando na porta 8000:
+     cloudflared tunnel --url http://localhost:8000
+   Abra o link https://....trycloudflare.com no tablet.
+
+
+------------------------------------------------------------------------
+5. BOLINHA DE STATUS DE CONEXAO NO APP
+------------------------------------------------------------------------
+No canto superior direito da tela do Aponta e Fala existe um indicador
+em tempo real da conexao:
+
+  [VERDE]    Online               -> Servidor rapido; toda IA ativa.
+  [AMARELA]  Conexao lenta        -> Rede instavel/lenta; app segue
+                                     funcionando sem travar toques.
+  [VERMELHA] Offline · modo local -> Sem conexao com o servidor.
+                                     A prancha, ordenacao, regras em
+                                     PT-BR, N-grama e voz continuam
+                                     funcionando localmente no tablet
+                                     e reconectam sozinhas quando a
+                                     rede voltar.
+
+IMPORTANTE: abra o app no tablet pelo menos 1 vez com conexao antes do
+evento para o navegador salvar a prancha no cache offline (Service
+Worker).
+========================================================================

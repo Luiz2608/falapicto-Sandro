@@ -14,7 +14,18 @@
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
     font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; user-select:none; touch-action: manipulation; }
-  #app { display:grid; height:100dvh; grid-template-rows: auto 1fr auto; gap:10px; padding:10px; }
+  #app { display:grid; height:100dvh; grid-template-rows: auto auto 1fr auto; gap:8px; padding:8px 10px 10px; }
+  #topbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 4px; }
+  #brand { font-size:.95rem; font-weight:800; color:#6b6352; letter-spacing:.2px; }
+  #netBadge { display:inline-flex; align-items:center; gap:7px; padding:4px 12px; border-radius:999px;
+    font-size:.85rem; font-weight:800; border:2px solid transparent; transition:background .2s, color .2s, border-color .2s;
+    background:#ECFDF5; color:#166534; border-color:#BBF7D0; }
+  #netBadge .dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; background:#22C55E;
+    box-shadow:0 0 0 3px rgba(34,197,94,.22); }
+  #netBadge.slow { background:#FFFBEB; color:#92400E; border-color:#FDE68A; }
+  #netBadge.slow .dot { background:#F59E0B; box-shadow:0 0 0 3px rgba(245,158,11,.25); }
+  #netBadge.off { background:#FEF2F2; color:#991B1B; border-color:#FECACA; }
+  #netBadge.off .dot { background:#EF4444; box-shadow:0 0 0 3px rgba(239,68,68,.25); }
 
   /* faixa de frase */
   #strip { display:grid; grid-template-columns: 1fr auto auto auto; gap:10px; align-items:stretch; }
@@ -73,11 +84,6 @@
   #toast { position:fixed; left:50%; bottom:110px; transform:translateX(-50%); background:#2B2B2B; color:#fff; padding:12px 22px;
     border-radius:16px; font-size:1.2rem; opacity:0; transition:opacity .2s; pointer-events:none; z-index:20; }
   #toast.on { opacity:1; }
-  #netBadge { position:fixed; right:14px; top:12px; z-index:15; display:none; align-items:center; gap:7px;
-    padding:6px 12px; border-radius:999px; font-size:.9rem; font-weight:800; background:#2B2B2B; color:#fff;
-    box-shadow:0 3px 10px rgba(0,0,0,.16); pointer-events:none; }
-  #netBadge.off { display:flex; background:#B45309; }
-  #netBadge .dot { width:9px; height:9px; border-radius:50%; background:#FDE68A; }
 
   @media (max-width: 700px) {
     #mid { grid-template-columns: 1fr; } #fixed { grid-template-rows:none; grid-template-columns:repeat(4,1fr); height:92px; }
@@ -87,6 +93,12 @@
 </head>
 <body>
 <div id="app">
+  <div id="topbar">
+    <span id="brand">Aponta e Fala</span>
+    <div id="netBadge" role="status" aria-live="polite" title="Status da conexão com o servidor">
+      <span class="dot"></span><span id="netText">Online</span>
+    </div>
+  </div>
   <div id="strip">
     <div id="sentence" aria-live="polite"></div>
     <button class="big" id="btnUndo" aria-label="Desfazer"><span>↩️</span>Voltar</button>
@@ -107,7 +119,6 @@
     <button class="big" id="btnClose" style="background:#777"><span>✖️</span>Fechar</button>
   </div>
 </div>
-<div id="netBadge" role="status" aria-live="polite"><span class="dot"></span>Modo offline · prancha e voz ativas</div>
 <div id="toast"></div>
 
 <script src="/static/offline-core.js"></script>
@@ -116,45 +127,80 @@ const $ = s => document.querySelector(s);
 const STORE_CFG = "apontaefala_cfg_v1", STORE_NGRAM = "apontaefala_ngram_v1";
 let CFG, CARDS_MAP = {}, NGRAM_LOCAL = {}, rotina = "lanche", seq = [], hist = [], sugestoes = [];   // hist = cards da última frase falada (memória da sessão)
 let voz = null, resultado = null;   // resultado = {ordem, frase} da última frase falada (mostra a ordem correta)
-let servidorOnline = navigator.onLine !== false, reconectarTimer = null;
+let servidorOnline = navigator.onLine !== false, statusRede = servidorOnline ? "online" : "offline", reconectarTimer = null;
 
 // Registra Service Worker p/ abertura e uso 100% offline em quedas de internet
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(e => console.warn("SW:", e));
 }
 
-function setStatusRede(online) {
-  const mudou = servidorOnline !== online;
-  servidorOnline = online;
-  $("#netBadge").classList.toggle("off", !online);
-  if (!online) {
-    if (mudou) toast("Sem conexão: usando modo offline (prancha e voz ativas)");
-    if (!reconectarTimer) reconectarTimer = setInterval(verificarConexao, 6000);
+function redeNavegadorLenta() {
+  const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!c) return false;
+  return ["slow-2g", "2g", "3g"].includes(c.effectiveType) || (typeof c.rtt === "number" && c.rtt >= 400);
+}
+
+function setStatusRede(estado, ms) {
+  // Aceita booleano (compatibilidade) ou "online" | "slow" | "offline"
+  let novo = typeof estado === "boolean" ? (estado ? "online" : "offline") : estado;
+  if (novo === "online" && ((typeof ms === "number" && ms >= 650) || redeNavegadorLenta())) {
+    novo = "slow";
+  }
+  const anterior = statusRede;
+  statusRede = novo;
+  servidorOnline = novo !== "offline";
+
+  const badge = $("#netBadge"), txt = $("#netText");
+  badge.classList.remove("slow", "off");
+  if (novo === "offline") {
+    badge.classList.add("off");
+    txt.textContent = "Offline · modo local";
+  } else if (novo === "slow") {
+    badge.classList.add("slow");
+    txt.textContent = typeof ms === "number" ? `Conexão lenta (${Math.round(ms)} ms)` : "Conexão lenta";
   } else {
-    if (reconectarTimer) { clearInterval(reconectarTimer); reconectarTimer = null; }
-    if (mudou) {
-      toast("Conexão com o servidor restabelecida");
-      atualizarSugestoes();
-    }
+    txt.textContent = "Online";
+  }
+
+  if (novo === "offline" && anterior !== "offline") {
+    toast("Sem conexão: usando modo offline (prancha e voz ativas)");
+  } else if (novo !== "offline" && anterior === "offline") {
+    toast("Conexão com o servidor restabelecida");
+    atualizarSugestoes();
+  }
+
+  if (!reconectarTimer) {
+    reconectarTimer = setInterval(verificarConexao, 8000);
   }
 }
 
 async function verificarConexao() {
-  if (navigator.onLine === false) return;
+  if (navigator.onLine === false) { setStatusRede("offline"); return; }
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), 2000);
+  const t = setTimeout(() => ctrl.abort(), 2500);
+  const t0 = performance.now();
   try {
     const r = await fetch("/api/health", { signal: ctrl.signal, cache: "no-store" });
     clearTimeout(t);
+    const ms = performance.now() - t0;
     if (r.ok) {
-      setStatusRede(true);
-      sincronizarDadosEmSegundoPlano();
+      const estavaOff = statusRede === "offline";
+      setStatusRede("online", ms);
+      if (estavaOff) sincronizarDadosEmSegundoPlano();
+    } else {
+      setStatusRede("offline");
     }
-  } catch { clearTimeout(t); }
+  } catch {
+    clearTimeout(t);
+    setStatusRede("offline");
+  }
 }
 
-window.addEventListener("offline", () => setStatusRede(false));
+window.addEventListener("offline", () => setStatusRede("offline"));
 window.addEventListener("online", () => verificarConexao());
+if (navigator.connection && navigator.connection.addEventListener) {
+  navigator.connection.addEventListener("change", () => verificarConexao());
+}
 
 // ---------- fala ----------
 function carregarVoz() {
@@ -182,9 +228,10 @@ const icone = c => c.img ? `<img src="${c.img}" alt="" draggable="false">` : c.e
 const nomeFalado = c => c.spoken || c.label;
 
 async function api(path, body, timeoutMs = 3500) {
-  if (navigator.onLine === false) { setStatusRede(false); throw new Error("offline"); }
+  if (navigator.onLine === false) { setStatusRede("offline"); throw new Error("offline"); }
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  const t0 = performance.now();
   try {
     const opts = body
       ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctrl.signal }
@@ -192,11 +239,14 @@ async function api(path, body, timeoutMs = 3500) {
     const r = await fetch(path, opts);
     clearTimeout(t);
     if (!r.ok) throw new Error("HTTP " + r.status);
-    setStatusRede(true);
+    const ms = performance.now() - t0;
+    // Ignora lentidao natural do SLM em /api/speak se < 1800ms; demais rotas >= 650ms marcam lenta
+    const limiteLento = path === "/api/speak" ? 1800 : 650;
+    setStatusRede(ms >= limiteLento ? "slow" : "online", ms);
     return await r.json();
   } catch (e) {
     clearTimeout(t);
-    setStatusRede(false);
+    setStatusRede("offline");
     throw e;
   }
 }
